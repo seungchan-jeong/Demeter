@@ -1,0 +1,24 @@
+#pragma kernel CSMain
+
+Texture2D<float4> DensityMap;
+Texture2D<float4> ThresholdMap;
+RWTexture2D<float4> Result;
+
+int thresholdWidth;
+int thresholdHeight;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // Result[id.xy] = float4(1.0f, 0.0f, 0.0f, 1.0f);
+    // Result[id.xy] = ThresholdMap[int2(id.x % thresholdWidth, id.y % thresholdHeight)];
+    // return;
+    if(DensityMap[id.xy].x > ThresholdMap[int2(id.x % thresholdWidth, id.y % thresholdHeight)].x)
+    {
+        Result[id.xy] = float4(1.0, 1.0, 1.0, 1.0);
+    }
+    else
+    {
+        Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+    }
+}
