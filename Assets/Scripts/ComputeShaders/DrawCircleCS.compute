@@ -1,0 +1,27 @@
+#pragma kernel CSMain
+
+struct Circle
+{
+    int x;
+    int y;
+    float radius;
+    float threshold;
+};
+RWStructuredBuffer<Circle> CircleBuffer;
+RWTexture2D<float4> Result;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    Circle c = CircleBuffer[id.x];
+    float rSquared = c.radius * c.radius;
+    for (int u = c.x - c.radius; u < c.x + c.radius + 1; u++)
+    {
+        for (int v = c.y - c.radius; v < c.y + c.radius + 1; v++)
+        {
+            if ((c.x - u) * (c.x - u) + (c.y - v) * (c.y - v) < rSquared) {
+                Result[int2(u,v)] = float4(c.threshold ,0.0, 1.0, 1.0);
+            }
+        }
+    }
+}
