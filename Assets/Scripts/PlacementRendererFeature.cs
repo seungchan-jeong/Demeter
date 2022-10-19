@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -6,25 +7,35 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 {
     class CustomRenderPass : ScriptableRenderPass
     {
+        private Terrain mainTerrain;
+        private Mesh cube;
+
+        private ComputeBuffer samplePointBuffer;
+        private ComputeBuffer pointCloudBuffer;
+        
         private ComputeBuffer argsBuffer;
         private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
-        private int subMeshIndex = 0;
-        private ComputeBuffer pointCloudBuffer;
         private int instanceCount = 64;
-        private Mesh cube;
+        private int subMeshIndex = 0;
         
+        private ComputeShader generateCS;
         private ComputeShader placementCS;
         private Material indirectMaterial;
 
-        public CustomRenderPass(Mesh cube, Material indirectMaterial, ComputeShader placementCS)
+        public CustomRenderPass(Mesh cube, Material indirectMaterial, ComputeShader placementCS, ComputeShader generateCS, Terrain mainTerrain)
         {
             this.cube = cube;
             this.indirectMaterial = indirectMaterial;
             this.placementCS = placementCS;
+            this.generateCS = generateCS;
+            this.mainTerrain = mainTerrain;
             
             argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
             //이거 크기를 그냥 크게 만들어두는건가? Compute Shader에서 실제 채워지는 양이 다르면 어떻게 처리? 
             pointCloudBuffer = new ComputeBuffer(instanceCount, sizeof(float) * 3 * 2 + sizeof(int));
+            samplePointBuffer = new ComputeBuffer(instanceCount, sizeof(float) * 7);
+            
+            FillDummySamplePointData();
         }
         
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
@@ -50,9 +61,31 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private void RunPipelines(CommandBuffer cmd, ScriptableRenderContext context)
         {
-            int kernelMain = placementCS.FindKernel("CSMain");
-            cmd.SetComputeBufferParam(placementCS, kernelMain,"foliagePoints", pointCloudBuffer);
-            cmd.DispatchCompute(placementCS, kernelMain, pointCloudBuffer.count / 64,1,1);
+            int generateCSMain = generateCS.FindKernel("CSMain");
+            cmd.SetComputeFloatParam(generateCS, "TerrainWidth", mainTerrain.terrainData.size.x);
+            cmd.SetComputeFloatParam(generateCS, "TerrainHeight", mainTerrain.terrainData.heightmapScale.y);
+            cmd.SetComputeFloatParam(generateCS, "TerrainLength", mainTerrain.terrainData.size.z);
+            cmd.SetComputeIntParam(generateCS, "HeightMapResolution", mainTerrain.terrainData.heightmapResolution);
+
+            // cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap",);
+            cmd.SetComputeTextureParam(generateCS, generateCSMain, "TerrainHeightMap", new RenderTargetIdentifier(mainTerrain.terrainData.heightmapTexture));
+
+            cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBuffer);
+            cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints", pointCloudBuffer);
+            
+            cmd.DispatchCompute(generateCS, generateCSMain, samplePointBuffer.count / 64, 1, 1);
+            // cmd.RequestAsyncReadback(pointCloudBuffer, (AsyncGPUReadbackRequest request) =>
+            // {
+            //     FoliagePoint[] points = request.GetData<FoliagePoint>(0).ToArray();
+            //     foreach (FoliagePoint point in points)
+            //     {
+            //         Debug.Log("Pos : " + point.worldPosition);
+            //     }
+            // });
+            
+            int placementCSMain = placementCS.FindKernel("CSMain");
+            // cmd.SetComputeBufferParam(placementCS, placementCSMain,"foliagePoints", pointCloudBuffer);
+            // cmd.DispatchCompute(placementCS, placementCSMain, pointCloudBuffer.count / 64,1,1);
             
             // cmd.RequestAsyncReadback(pointCloudBuffer, (AsyncGPUReadbackRequest request) =>
             // {
@@ -81,6 +114,46 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             }
             
         }
+
+        private void FillDummySamplePointData()
+        {
+            List<SamplePoint> samplePoints = new List<SamplePoint>();
+            for (int i = 0; i < instanceCount; i++)
+            {
+                SamplePoint samplePoint = new SamplePoint
+                {
+                    // densityMapUV = new Vector2(1.0f / (float)instanceCount * i, 1.0f / (float)instanceCount * i)
+                    densityMapUV = new Vector2(Random.value, Random.value)
+                };
+                samplePoint.heightMapUV = samplePoint.densityMapUV;
+                samplePoint.threshold = -1.0f;
+                samplePoints.Add(samplePoint);
+
+                // float x = samplePoint.heightMapUV.x * mainTerrain.terrainData.size.z;
+                // float y = samplePoint.heightMapUV.y * mainTerrain.terrainData.size.z;
+                // float terrainHeight = mainTerrain.SampleHeight(new Vector3(x, 0.0f, y));
+                // Debug.Log(
+                //     $" height : {terrainHeight}" +
+                //     $" x : {x}, y : {y}");
+            }
+
+            samplePointBuffer.SetData(samplePoints);
+        }
+
+        private void ToHeightMapUVFromDensityMapUV(Vector2 densityMapUV)
+        {
+            /*
+             * 1. DensityMap은 항상 64x64이다.
+             * 2. bayerMatrix의 samplePoint 사이의 거리 w 는 footprint와 같다.
+             * 2-1. samplePoint사이의 거리 w는 pixel 단위로 N pixel이다.
+             * 2-2. 
+             */
+            
+            /*
+             * 임시로
+             */
+        }
+
     }
 
     struct FoliagePoint
@@ -89,6 +162,14 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         public Vector3 worldNormal;
         public int foliageType;
     }
+    
+    struct SamplePoint
+    {
+        public Vector2 bayerMatrixUV;
+        public Vector2 densityMapUV;  //지금은 테스트 용으로 density Map과 height Map을 1:1로 매칭 
+        public Vector2 heightMapUV;
+        public float threshold;
+    };
 
     CustomRenderPass m_ScriptablePass;
     [SerializeField]
@@ -97,11 +178,14 @@ public class PlacementRendererFeature : ScriptableRendererFeature
     private Material indirectMaterial;
     [SerializeField]
     private ComputeShader placementCS;
-
+    [SerializeField]
+    private ComputeShader generateCS;
+    [SerializeField] 
+    // private Terrain mainTerrain;
     /// <inheritdoc/>
     public override void Create()
     {
-        m_ScriptablePass = new CustomRenderPass(cube, indirectMaterial, placementCS);
+        m_ScriptablePass = new CustomRenderPass(cube, indirectMaterial, placementCS, generateCS, Terrain.activeTerrain);
         m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
     }
 

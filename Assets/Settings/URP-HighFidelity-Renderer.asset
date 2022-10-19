@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8068bd7aa23c4a4c9afd761994f6525, type: 3}
   m_Name: PlacementRendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   cube: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   indirectMaterial: {fileID: 2100000, guid: ffdc1c2de0afe534ea69019537b7f8c8, type: 2}
   placementCS: {fileID: 7200000, guid: 10883e7cee804f3489063a66b06ff916, type: 3}

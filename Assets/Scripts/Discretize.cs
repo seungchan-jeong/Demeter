@@ -31,8 +31,8 @@ public class Discretize : MonoBehaviour
     private void Start()
     {
         RunDiscretization();
+        SaveToPNG();
     }
-
     public void RunDiscretization()
     {
         if (thresholdMap == null)
@@ -71,5 +71,19 @@ public class Discretize : MonoBehaviour
         computeShader.GetKernelThreadGroupSizes(kernelID, out uint x, out uint y, out uint _);
         computeShader.Dispatch(kernelID, Mathf.Max(DensityMapWidth / (int)x, 1), 
             Mathf.Max(DensityMapHeight/ (int)y , 1), 1);
+        
+        
     }
+    private void SaveToPNG()
+    {
+        Texture2D tex = new Texture2D(DensityMapWidth, DensityMapWidth, TextureFormat.R8, false);
+
+        RenderTexture.active = discretizeResultRT;
+        tex.ReadPixels(new Rect(0, 0, discretizeResultRT.width, discretizeResultRT.height), 0, 0);
+        tex.Apply();
+
+        byte[] bytes = tex.EncodeToPNG();
+        System.IO.File.WriteAllBytes("C:\\Users\\seungchan.jeong\\dithered.png", bytes);
+    }
+
 }
