@@ -12,6 +12,7 @@ public class ShowHeightmap : MonoBehaviour
     private void OnEnable()
     {
         rawImage.texture = terrain.terrainData.heightmapTexture;
+        // rawImage.texture = terrain.terrainData.GetAlphamapTexture(0);
     }
     
 }
