@@ -31,7 +31,7 @@ struct FoliagePoint
     float3 worldNormal;
     int foliageType;
 };
-RWStructuredBuffer<FoliagePoint> foliagePoints;
+AppendStructuredBuffer<FoliagePoint> foliagePoints;
 
 uint Hash(uint s)
 {
@@ -150,11 +150,7 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
         //2. samplePoint에서의 worldNormal 계산
         //
         
-        foliagePoints[targetIndex] = foliagePoint;
-    }
-    else
-    {
-        foliagePoints[targetIndex] = (FoliagePoint)0;
+        foliagePoints.Append(foliagePoint);
     }
 }
 

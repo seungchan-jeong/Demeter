@@ -64,8 +64,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
             {
                 pointCloudBuffer =
-                    new ComputeBuffer(instanceCountSqrt * instanceCountSqrt, sizeof(float) * 19 + sizeof(int));
-                samplePointBuffer = new ComputeBuffer(instanceCountSqrt * instanceCountSqrt, sizeof(float) * 7);
+                    new ComputeBuffer(instanceCountSqrt * instanceCountSqrt, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append);
                 SetSamplePointBufferByFootprint(foliageDataAndFootprint.Key);
                 
                 RunPipelines(cmd, context, foliageDataAndFootprint.Value);
@@ -114,7 +113,8 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 samplePoint.threshold = 0.8f;
                 samplePoints.Add(samplePoint);
             }
-
+            
+            samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 7);
             samplePointBuffer.SetData(samplePoints);
         }
 
@@ -160,10 +160,27 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
             cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBuffer);
             cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints", pointCloudBuffer);
-
+            
+            cmd.SetBufferCounterValue(pointCloudBuffer, 0);
             cmd.DispatchCompute(generateCS, generateCSMain,
                 Mathf.CeilToInt((float)instanceCountSqrt * instanceCountSqrt / 64), 1, 1);
-
+            
+            // cmd.RequestAsyncReadback(pointCloudBuffer, (AsyncGPUReadbackRequest request) =>
+            // {
+            //     FoliagePoint[] points = request.GetData<FoliagePoint>(0).ToArray();
+            //     int zeroCount = 0;
+            //     foreach (FoliagePoint point in points)
+            //     {
+            //         Vector3 pos = new Vector3(point.TRSMat.m03, point.TRSMat.m13, point.TRSMat.m23);
+            //         // Debug.Log("Pos : " + pos);
+            //         if(Vector3.SqrMagnitude(pos - Vector3.zero) < Mathf.Epsilon)
+            //         {
+            //             zeroCount++;
+            //         }
+            //     }
+            //     Debug.Log(zeroCount);
+            // });
+            
             // int placementCSMain = placementCS.FindKernel("CSMain");
             // cmd.SetComputeBufferParam(placementCS, placementCSMain,"foliagePoints", pointCloudBuffer);
             // cmd.DispatchCompute(placementCS, placementCSMain, pointCloudBuffer.count / 64,1,1);
@@ -180,13 +197,14 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                     if (item.FoliageMesh != null)
                     {
                         args[0] = (uint)item.FoliageMesh.GetIndexCount(subMeshIndex);
-                        args[1] = (uint)instanceCountSqrt * (uint)instanceCountSqrt; //to do : 여기서 count를 계산하지 않고 argsbuffer도 generateCS에 넘겨서, count를 거기서 update하도록 변경해야함. 
+                        // args[1] = (uint)instanceCountSqrt * (uint)instanceCountSqrt; //to do : 여기서 count를 계산하지 않고 argsbuffer도 generateCS에 넘겨서, count를 거기서 update하도록 변경해야함. 
                         args[2] = (uint)item.FoliageMesh.GetIndexStart(subMeshIndex);
                         args[3] = (uint)item.FoliageMesh.GetBaseVertex(subMeshIndex);
 
                         ComputeBuffer argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint),
                             ComputeBufferType.IndirectArguments);
                         argsBuffer.SetData(args);
+                        cmd.CopyCounterValue(pointCloudBuffer, argsBuffer, sizeof(uint));
 
                         foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBuffer);
                         foliageMaterials[subMeshIndex].SetInt("_FoliageType", i);
