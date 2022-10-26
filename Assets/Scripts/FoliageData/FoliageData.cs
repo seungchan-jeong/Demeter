@@ -8,6 +8,8 @@ public class FoliageData : ScriptableObject
     [SerializeField] 
     private GameObject foliagePrefab;
     [SerializeField]
+    private Vector3 foliageScale;
+    [SerializeField]
     private float footprint;
     public Mesh FoliageMesh
     {
@@ -38,7 +40,30 @@ public class FoliageData : ScriptableObject
     }
     
     public float Footprint { get { return footprint; } }
-    
+    public Vector3 FoliageScale
+    {
+        get { return foliageScale; }
+    }
+
+    public Texture2D DensityMap
+    {
+        get
+        {
+            //Temp Code below
+            if (Terrain.activeTerrain == null)
+            {
+                return null;
+            }
+
+            if (foliagePrefab.name.Contains("Conifer"))
+            {
+                return Terrain.activeTerrain.terrainData.GetAlphamapTexture(0);
+            }
+
+            return Terrain.activeTerrain.terrainData.GetAlphamapTexture(0);
+        }
+    }
+
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
 }

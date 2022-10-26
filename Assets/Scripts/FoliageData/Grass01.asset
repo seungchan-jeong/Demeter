@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a31cad206455ac4cb79fe2e1d9ed6bc, type: 3}
   m_Name: Grass01
   m_EditorClassIdentifier: 
-  foliageMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  footprint: 0.5
+  foliagePrefab: {fileID: 8422915943439563590, guid: c27cc164565f262419ba9d1faca474f5,
+    type: 3}
+  foliageScale: {x: 1, y: 1, z: 1}
+  footprint: 1

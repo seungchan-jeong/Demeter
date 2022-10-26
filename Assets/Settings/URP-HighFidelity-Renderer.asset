@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: PlacementRendererFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  foliageData: {fileID: 11400000, guid: 23d3232f60781d840bffbf29c40c22a9, type: 2}
+  foliageDataList:
+  - {fileID: 11400000, guid: 23d3232f60781d840bffbf29c40c22a9, type: 2}
+  - {fileID: 11400000, guid: 5421904f762ed074cbbc0f4e9f700fa6, type: 2}
+  - {fileID: 11400000, guid: bdfa2f8d17c4a694d844dca8ea7c0f63, type: 2}
+  - {fileID: 11400000, guid: c87ff2244264cc945ac705f55e0dd76d, type: 2}
   discretedDensityMap: {fileID: 2800000, guid: 04b31c632273eb44a8d8f0f96555e705, type: 3}
-  indirectMaterial: {fileID: 2100000, guid: ffdc1c2de0afe534ea69019537b7f8c8, type: 2}
   placementCS: {fileID: 7200000, guid: 10883e7cee804f3489063a66b06ff916, type: 3}
   generateCS: {fileID: 7200000, guid: 31f4241bd1ed63d4eaca3504ba438b90, type: 3}
 --- !u!114 &-1878332245247344467

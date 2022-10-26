@@ -4,11 +4,18 @@ float TerrainWidth;
 float TerrainLength;
 float TerrainHeight;
 
-int DensityMapResolution;
-Texture2D<float4> DensityMap;
-
 int TerrainHeightMapResolution;
 Texture2D<float4> TerrainHeightMap; //Todo float4 -> float1
+
+Texture2DArray<float4> DensityMaps;
+struct FoliageData
+{
+    int DensityMapResolution;
+    float3 FoliageScale;
+    float3 ZitterScale;
+};
+StructuredBuffer<FoliageData> foliageData;
+int FoliageDataCount;
 
 struct SamplePoint
 {
@@ -25,6 +32,22 @@ struct FoliagePoint
     int foliageType;
 };
 RWStructuredBuffer<FoliagePoint> foliagePoints;
+
+uint Hash(uint s)
+{
+    s ^= 2747636419u;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    return s;
+}
+
+float Random(uint seed)
+{
+    return float(Hash(seed)) / 4294967295.0; // 2^32-1
+}
 
 float4x4 m_translate(float4x4 m, float3 v)
 {
@@ -87,20 +110,45 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
 {
     int targetIndex = groupIndex + groupID.x * 64;
     SamplePoint samplePoint = samplePoints[targetIndex];
-    float density = DensityMap[samplePoint.densityMapUV * DensityMapResolution].g;
 
-    if(density > samplePoint.threshold)
+    float densitySum = 0.0f;
+    for(int i = 0 ; i < FoliageDataCount; i++)
     {
-        //1. samplePoint에서의 worldPosition 계산
+        densitySum += DensityMaps[uint3(samplePoint.densityMapUV * foliageData[i].DensityMapResolution, i)].x;
+    }
+    
+    if(densitySum > samplePoint.threshold)
+    {
         FoliagePoint foliagePoint = (FoliagePoint)0;
-        float terrainWorldHeight = TerrainHeightMap[samplePoint.heightMapUV * TerrainHeightMapResolution] * TerrainHeight * 2.0f; //To Do : 이거 왜 2배 해야함??
         
+        //0. 확률 분포에 따라 생성 될 FoliageData 선택.
+        int choosenFoliageIndex = 0;
+        float randRange = 1.0f;
+        float randFloat = Random(id.x);
+
+        for(int i = 0 ; i < FoliageDataCount; i++)
+        {
+            float normalizedDensity = DensityMaps[uint3(samplePoint.densityMapUV * foliageData[i].DensityMapResolution, i)].x / densitySum;
+            if(randRange - normalizedDensity <= randFloat && randFloat < randRange)
+            {
+                choosenFoliageIndex = i;
+                break;
+            }
+            randRange -= normalizedDensity;
+        }
+        foliagePoint.foliageType = choosenFoliageIndex;
+        float3 scaleZitter = foliageData[choosenFoliageIndex].ZitterScale * float3(Random(id.x), Random(id.y), Random(id.z));
+        
+        //1. samplePoint에서의 worldPosition 계산
+        float terrainWorldHeight = TerrainHeightMap[samplePoint.heightMapUV * TerrainHeightMapResolution] * TerrainHeight * 2.0f; //To Do : 이거 왜 2배 해야함??
         float3 worldPosition = float3(TerrainWidth * samplePoint.heightMapUV.x,
             terrainWorldHeight, TerrainLength * samplePoint.heightMapUV.y);
-        foliagePoint.TRSMat = trs(worldPosition, float4(0.0f, 0.0f, 0.0f, 1.0f), float3(1.0f, 1.0f, 1.0f));
-        // foliagePoint.TRSMat = trs(float3(0.0f, 0.0f, 0.0f), float4(0.0f, 0.0f, 0.0f, 1.0f), float3(1.0f, 1.0f, 1.0f));
+         
+        foliagePoint.TRSMat = trs(worldPosition, float4(0.0f, 0.0f, 0.0f, 1.0f), foliageData[choosenFoliageIndex].FoliageScale + scaleZitter);
+
         
         //2. samplePoint에서의 worldNormal 계산
+        //
         
         foliagePoints[targetIndex] = foliagePoint;
     }

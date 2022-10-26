@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a31cad206455ac4cb79fe2e1d9ed6bc, type: 3}
+  m_Name: Tree03
+  m_EditorClassIdentifier: 
+  foliagePrefab: {fileID: 5987564922316066233, guid: 2d250084949c1f64c885f5a3587e6b04,
+    type: 3}
+  foliageScale: {x: 0.1, y: 0.1, z: 0.1}
+  footprint: 4

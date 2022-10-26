@@ -1,4 +1,4 @@
-Shader "Custom/IndirectDrawMaterial"
+Shader "Indirect/IndirectTest"
 {
     SubShader {
         Tags { "RenderType" = "Opaque" }
