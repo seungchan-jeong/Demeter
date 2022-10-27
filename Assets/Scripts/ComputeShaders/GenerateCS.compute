@@ -31,7 +31,10 @@ struct FoliagePoint
     float3 worldNormal;
     int foliageType;
 };
-AppendStructuredBuffer<FoliagePoint> foliagePoints;
+AppendStructuredBuffer<FoliagePoint> foliagePoints01;
+AppendStructuredBuffer<FoliagePoint> foliagePoints02;
+AppendStructuredBuffer<FoliagePoint> foliagePoints03;
+AppendStructuredBuffer<FoliagePoint> foliagePoints04;
 
 uint Hash(uint s)
 {
@@ -149,8 +152,24 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
         
         //2. samplePoint에서의 worldNormal 계산
         //
-        
-        foliagePoints.Append(foliagePoint);
+
+        //3. out Append
+        if(choosenFoliageIndex == 0)
+        {
+            foliagePoints01.Append(foliagePoint);
+        }
+        else if(choosenFoliageIndex == 1)
+        {
+            foliagePoints02.Append(foliagePoint);
+        }
+        else if(choosenFoliageIndex == 2)
+        {
+            foliagePoints03.Append(foliagePoint);
+        }
+        else
+        {
+            foliagePoints04.Append(foliagePoint);
+        }
     }
 }
 

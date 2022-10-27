@@ -15,8 +15,8 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         private Texture2D discretedDensityMap;
 
         private ComputeBuffer samplePointBuffer;
-        private ComputeBuffer pointCloudBuffer;
-
+        private List<ComputeBuffer> pointCloudBufferList;
+        
         private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
         private int instanceCountSqrt = 100;
 
@@ -36,7 +36,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             this.discretedDensityMap = mainTerrain.terrainData.GetAlphamapTexture(0);
             
             poissonDiskSampler = new PoissonDiskSampler();
-
+            pointCloudBufferList = new List<ComputeBuffer>();
             foliageDataByFootprint = new Dictionary<int, List<FoliageData>>();
             foreach (FoliageData foliageData in foliageDataList)
             {
@@ -63,8 +63,8 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             cmd.BeginSample("PlacementRenderer");
             foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
             {
-                SetSamplePointBufferByFootprint(foliageDataAndFootprint.Key);
-                
+                InitSamplePointBuffer(foliageDataAndFootprint.Key);
+                InitPointCloudBuffer(foliageDataAndFootprint.Value);
                 RunPipelines(cmd, context, foliageDataAndFootprint.Value);
                 DrawIndirect(cmd, context, foliageDataAndFootprint.Value);
             }
@@ -79,7 +79,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         {
         }
 
-        private void SetSamplePointBufferByFootprint(float foliageDataFootprint)
+        private void InitSamplePointBuffer(float foliageDataFootprint)
         {
             List<SamplePoint> samplePoints = new List<SamplePoint>();
             List<Vector2> poissonUVs = null;
@@ -112,11 +112,19 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 samplePoints.Add(samplePoint);
             }
             
-            samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 7);
+            samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 7); //todo : 매번 new 하지 않아도 되고, Sample Point 종류마다만 있으면 될 듯. 
             samplePointBuffer.SetData(samplePoints);
             
-            pointCloudBuffer =
-                new ComputeBuffer(samplePoints.Count, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append);
+            
+        }
+        
+        private void InitPointCloudBuffer(List<FoliageData> foliageData)
+        {
+            pointCloudBufferList.Clear();
+            for (int i = 0; i < foliageData.Count; i++)
+            {
+                pointCloudBufferList.Add(new ComputeBuffer(samplePointBuffer.count, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
+            }
         }
 
         private void RunPipelines(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData)
@@ -160,9 +168,11 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 new RenderTargetIdentifier(densityMapArray));
 
             cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBuffer);
-            cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints", pointCloudBuffer);
-            
-            cmd.SetBufferCounterValue(pointCloudBuffer, 0);
+            for (int i = 0; i < pointCloudBufferList.Count; i++)
+            {
+                cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), pointCloudBufferList[i]);
+                cmd.SetBufferCounterValue(pointCloudBufferList[i], 0);
+            }
             cmd.DispatchCompute(generateCS, generateCSMain,
                 Mathf.CeilToInt((float)samplePointBuffer.count / 64), 1, 1);
             
@@ -173,7 +183,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData)
         {
-            for(int i = 0 ; i < foliageData.Count; i++)
+            for(int i = 0 ; i < foliageData.Count; i++) //todo foliageData.Count 와 pointCLoudBuffer.Count는 항상 같다. 이걸 보장할 방법 찾기. 
             {
                 FoliageData item = foliageData[i];
                 Material[] foliageMaterials = item.FoliageMaterials;
@@ -189,9 +199,9 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                         ComputeBuffer argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint),
                             ComputeBufferType.IndirectArguments);
                         argsBuffer.SetData(args);
-                        cmd.CopyCounterValue(pointCloudBuffer, argsBuffer, sizeof(uint));
+                        cmd.CopyCounterValue(pointCloudBufferList[i], argsBuffer, sizeof(uint));
 
-                        foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBuffer);
+                        foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferList[i]);
                         foliageMaterials[subMeshIndex].SetInt("_FoliageType", i);
                         cmd.DrawMeshInstancedIndirect(item.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex],
                             0, argsBuffer);
