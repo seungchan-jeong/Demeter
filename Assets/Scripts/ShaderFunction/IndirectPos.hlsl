@@ -78,11 +78,21 @@ StructuredBuffer<InstanceData> _PerInstanceData;
 		}
 		else
 		{
-			//Temp. 이렇게 하지말고 shader 계산 자체를 아에 안하도록 해야함. (pipeline discard)
-			// float4x4 zeroMat = float4x4(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-			//
-			// objectToWorld = zeroMat;
-			// worldToObject = zeroMat;
+			// Temp. 이렇게 하지말고 shader 계산 자체를 아에 안하도록 해야함. (pipeline discard)
+			//=> 아 이 처리가 필요하긴하네, Same Footprint 일 경우, Sample Point에서 완벽히 걸러지지 않고, Draw때 Foliage Type에 따라 걸러져야하므로.
+
+			/*
+			 * 완벽하게 해결하려면
+			 * 1) 이 쉐이더에서 foliageType이 맞지 않으면 Vertex를 버린다. (Pipeline을 탈출)
+			 * 2) Compute Shader 결과에서 Sample Point를 Foliage Data 종류에 맞게 구분해서 내보내준다.
+			 *    -> 이럴려면 '최대' layer 만큼의 append compute buffer가 필요함.
+			 *    -> 이게 나을 것 같기도? 만약에 사용안할 경우 compute buffer를 연결 안해주면 그만 (생성자체를 안하면 그만) 
+			 *
+			 */
+			 float4x4 zeroMat = float4x4(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+			
+			 objectToWorld = zeroMat;
+			 worldToObject = zeroMat;
 		}
 	}
 

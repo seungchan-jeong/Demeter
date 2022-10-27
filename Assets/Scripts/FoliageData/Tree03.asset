@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foliagePrefab: {fileID: 5987564922316066233, guid: 2d250084949c1f64c885f5a3587e6b04,
     type: 3}
-  foliageScale: {x: 0.1, y: 0.1, z: 0.1}
+  foliageScale: {x: 0.2, y: 0.2, z: 0.2}
   footprint: 4
