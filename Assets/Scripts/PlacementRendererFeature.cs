@@ -16,6 +16,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private ComputeBuffer samplePointBuffer;
         private List<ComputeBuffer> pointCloudBufferList;
+        private const int POINT_CLOUD_BUFFER_NUM_MAX = 4;
         
         private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
         private int instanceCountSqrt = 100;
@@ -173,8 +174,31 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), pointCloudBufferList[i]);
                 cmd.SetBufferCounterValue(pointCloudBufferList[i], 0);
             }
+
+            for (int i = pointCloudBufferList.Count; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
+            {
+                ComputeBuffer temp = new ComputeBuffer(1, 4);
+                cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), temp);
+            }
+            
             cmd.DispatchCompute(generateCS, generateCSMain,
                 Mathf.CeilToInt((float)samplePointBuffer.count / 64), 1, 1);
+            
+            // cmd.RequestAsyncReadback(pointCloudBufferList[0], (AsyncGPUReadbackRequest request) =>
+            // {
+            //     FoliagePoint[] points = request.GetData<FoliagePoint>(0).ToArray();
+            //     int zeroCount = 0;
+            //     foreach (FoliagePoint point in points)
+            //     {
+            //         Vector3 pos = new Vector3(point.TRSMat.m03, point.TRSMat.m13, point.TRSMat.m23);
+            //         // Debug.Log("Pos : " + pos);
+            //         if(Vector3.SqrMagnitude(pos - Vector3.zero) < Mathf.Epsilon)
+            //         {
+            //             zeroCount++;
+            //         }
+            //     }
+            //     Debug.Log("zero : " + zeroCount);
+            // });
             
             // int placementCSMain = placementCS.FindKernel("CSMain");
             // cmd.SetComputeBufferParam(placementCS, placementCSMain,"foliagePoints", pointCloudBuffer);
@@ -183,7 +207,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData)
         {
-            for(int i = 0 ; i < foliageData.Count; i++) //todo foliageData.Count 와 pointCLoudBuffer.Count는 항상 같다. 이걸 보장할 방법 찾기. 
+            for(int i = 0 ; i < foliageData.Count; i++) //todo foliageData.Count 와 pointCloudBuffer.Count는 항상 같다. 이걸 보장할 방법 찾기. 
             {
                 FoliageData item = foliageData[i];
                 Material[] foliageMaterials = item.FoliageMaterials;
@@ -202,7 +226,6 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                         cmd.CopyCounterValue(pointCloudBufferList[i], argsBuffer, sizeof(uint));
 
                         foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferList[i]);
-                        foliageMaterials[subMeshIndex].SetInt("_FoliageType", i);
                         cmd.DrawMeshInstancedIndirect(item.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex],
                             0, argsBuffer);
                     }
