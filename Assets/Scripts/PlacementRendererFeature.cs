@@ -95,14 +95,15 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 {
                     SamplePoint samplePoint = new SamplePoint
                     {
-                        densityMapUV = pos
+                        densityMapUV = pos,
+                        heightMapUV = pos,
+                        threshold = 0.8f,
+                        pad = 0.0f
                     };
-                    samplePoint.heightMapUV = samplePoint.densityMapUV;
-                    samplePoint.threshold = 0.8f;
                     samplePoints.Add(samplePoint);
                 }
                 
-                ComputeBuffer samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 7); 
+                ComputeBuffer samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 8); 
                 samplePointBuffer.SetData(samplePoints);
                 samplePointBufferDict.Add((int)foliageDataFootprint, samplePointBuffer);
             }
@@ -121,12 +122,13 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                     {
                         densityMapResolution = item.DensityMap.width,
                         foliageScale = item.FoliageScale,
-                        zitterScale = item.FoliageScale * 0.1f
+                        zitterScale = item.FoliageScale * 0.1f,
+                        pad = 0.0f
                     };
                     foliageComputeBufferDataList.Add(fcbd);
                 }
                 
-                ComputeBuffer foliageDataComputeBuffer = new ComputeBuffer(currentList.Count, sizeof(int) * 1 + sizeof(float) * 6);
+                ComputeBuffer foliageDataComputeBuffer = new ComputeBuffer(currentList.Count, sizeof(int) * 1 + sizeof(float) * 7);
                 foliageDataComputeBuffer.SetData(foliageComputeBufferDataList);
                 foliageComputeBufferDataDict.Add(foliageDataByFootprint.Key, foliageDataComputeBuffer);
             }
@@ -283,6 +285,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         public Vector2 densityMapUV;  //지금은 테스트 용으로 density Map과 height Map을 1:1로 매칭 
         public Vector2 heightMapUV;
         public float threshold;
+        public float pad;
     };
     
     struct FoliageComputeBufferData
@@ -290,6 +293,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         public int densityMapResolution;
         public Vector3 foliageScale;
         public Vector3 zitterScale;
+        public float pad;
     };
     
     CustomRenderPass m_ScriptablePass;

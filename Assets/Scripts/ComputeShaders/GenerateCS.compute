@@ -13,6 +13,7 @@ struct FoliageData
     int DensityMapResolution;
     float3 FoliageScale;
     float3 ZitterScale;
+    float pad;
 };
 StructuredBuffer<FoliageData> foliageData;
 int FoliageDataCount;
@@ -23,6 +24,7 @@ struct SamplePoint
     float2 densityMapUV;
     float2 heightMapUV;
     float threshold;
+    float pad;
 };
 StructuredBuffer<SamplePoint> samplePoints; 
 struct FoliagePoint
