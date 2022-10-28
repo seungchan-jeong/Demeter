@@ -54,12 +54,6 @@ public class FoliageData : ScriptableObject
             {
                 return null;
             }
-
-            if (foliagePrefab.name.Contains("Conifer"))
-            {
-                return Terrain.activeTerrain.terrainData.GetAlphamapTexture(0);
-            }
-
             return Terrain.activeTerrain.terrainData.GetAlphamapTexture(0);
         }
     }

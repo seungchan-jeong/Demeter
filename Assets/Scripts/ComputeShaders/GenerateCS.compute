@@ -7,7 +7,7 @@ float TerrainHeight;
 int TerrainHeightMapResolution;
 Texture2D<float4> TerrainHeightMap; //Todo float4 -> float1
 
-Texture2DArray<float4> DensityMaps;
+Texture2D<float4> DensityMap;
 struct FoliageData
 {
     int DensityMapResolution;
@@ -117,7 +117,7 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
     float densitySum = 0.0f;
     for(int i = 0 ; i < FoliageDataCount; i++)
     {
-        densitySum += DensityMaps[uint3(samplePoint.densityMapUV * foliageData[i].DensityMapResolution, i)].g;
+        densitySum += DensityMap[uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][1];
     }
     
     if(densitySum > samplePoint.threshold)
@@ -131,7 +131,7 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
 
         for(int i = 0 ; i < FoliageDataCount; i++)
         {
-            float normalizedDensity = DensityMaps[uint3(samplePoint.densityMapUV * foliageData[i].DensityMapResolution, i)].g / densitySum;
+            float normalizedDensity = DensityMap[uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][1] / densitySum;
             if(randRange - normalizedDensity <= randFloat && randFloat < randRange)
             {
                 choosenFoliageIndex = i;

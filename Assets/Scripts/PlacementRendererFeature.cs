@@ -12,9 +12,9 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         private List<FoliageData> foliageDataList;
         private Dictionary<int, List<FoliageData>> foliageDataByFootprint;
         private Terrain mainTerrain;
-        private Texture2D discretedDensityMap;
 
-        private ComputeBuffer samplePointBuffer;
+        private Dictionary<int, ComputeBuffer> samplePointBufferDict;
+        private Dictionary<int, ComputeBuffer> foliageComputeBufferDataDict;
         private List<ComputeBuffer> pointCloudBufferList;
         private const int POINT_CLOUD_BUFFER_NUM_MAX = 4;
         
@@ -26,19 +26,26 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private PoissonDiskSampler poissonDiskSampler;
 
-        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS,
-            Terrain mainTerrain, Texture2D discretedDensityMap)
+        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, Terrain mainTerrain)
         {
             this.foliageDataList = foliageDataList;
             this.placementCS = placementCS;
             this.generateCS = generateCS;
             this.mainTerrain = mainTerrain;
-            // this.discretedDensityMap = discretedDensityMap;
-            this.discretedDensityMap = mainTerrain.terrainData.GetAlphamapTexture(0);
-            
+
             poissonDiskSampler = new PoissonDiskSampler();
             pointCloudBufferList = new List<ComputeBuffer>();
             foliageDataByFootprint = new Dictionary<int, List<FoliageData>>();
+            samplePointBufferDict = new Dictionary<int, ComputeBuffer>();
+            foliageComputeBufferDataDict = new Dictionary<int, ComputeBuffer>();
+
+            InitFoliageDictionary();
+            InitSamplePointBuffer();
+            InitFoliageDataBuffer();
+        }
+
+        private void InitFoliageDictionary()
+        {
             foreach (FoliageData foliageData in foliageDataList)
             {
                 int footprint = (int)foliageData.Footprint;
@@ -52,8 +59,94 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 }
             }
         }
+        
+        private void InitSamplePointBuffer()
+        {
+            foreach (FoliageData foliageData in foliageDataList)
+            {
+                float foliageDataFootprint = foliageData.Footprint;
+
+                if (samplePointBufferDict.ContainsKey((int)foliageDataFootprint))
+                {
+                    continue;
+                }
+
+                List<SamplePoint> samplePoints = new List<SamplePoint>();
+                List<Vector2> poissonUVs = null;
+                if (Math.Abs(foliageDataFootprint - 1.0f) < Mathf.Epsilon)
+                {
+                    poissonUVs = poissonDiskSampler.Get10000Points();
+                }
+                else if (Math.Abs(foliageDataFootprint - 2.0f) < Mathf.Epsilon)
+                {
+                    poissonUVs = poissonDiskSampler.Get2500Points();
+                }
+                else if (Math.Abs(foliageDataFootprint - 4.0f) < Mathf.Epsilon)
+                {
+                    poissonUVs = poissonDiskSampler.Get500Points();
+                }
+
+                if (poissonUVs == null)
+                {
+                    continue;
+                }
+
+                foreach (Vector2 pos in poissonUVs)
+                {
+                    SamplePoint samplePoint = new SamplePoint
+                    {
+                        densityMapUV = pos
+                    };
+                    samplePoint.heightMapUV = samplePoint.densityMapUV;
+                    samplePoint.threshold = 0.8f;
+                    samplePoints.Add(samplePoint);
+                }
+                
+                ComputeBuffer samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 7); 
+                samplePointBuffer.SetData(samplePoints);
+                samplePointBufferDict.Add((int)foliageDataFootprint, samplePointBuffer);
+            }
+        }
+
+        private void InitFoliageDataBuffer()
+        {
+            foreach(var foliageDataByFootprint in foliageDataByFootprint)
+            {
+                List<FoliageData> currentList = foliageDataByFootprint.Value;
+                List<FoliageComputeBufferData> foliageComputeBufferDataList = new List<FoliageComputeBufferData>();
+                for(int i = 0; i < currentList.Count; i++)
+                {
+                    FoliageData item = currentList[i];
+                    FoliageComputeBufferData fcbd = new FoliageComputeBufferData()
+                    {
+                        densityMapResolution = item.DensityMap.width,
+                        foliageScale = item.FoliageScale,
+                        zitterScale = item.FoliageScale * 0.1f
+                    };
+                    foliageComputeBufferDataList.Add(fcbd);
+                }
+                
+                ComputeBuffer foliageDataComputeBuffer = new ComputeBuffer(currentList.Count, sizeof(int) * 1 + sizeof(float) * 6);
+                foliageDataComputeBuffer.SetData(foliageComputeBufferDataList);
+                foliageComputeBufferDataDict.Add(foliageDataByFootprint.Key, foliageDataComputeBuffer);
+            }
+        }
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            int generateCSMain = generateCS.FindKernel("CSMain");
+            
+            cmd.SetComputeFloatParam(generateCS, "TerrainWidth", mainTerrain.terrainData.size.x);
+            cmd.SetComputeFloatParam(generateCS, "TerrainHeight", mainTerrain.terrainData.heightmapScale.y);
+            cmd.SetComputeFloatParam(generateCS, "TerrainLength", mainTerrain.terrainData.size.z);
+            
+            cmd.SetComputeTextureParam(generateCS, generateCSMain, "TerrainHeightMap",
+                new RenderTargetIdentifier(mainTerrain.terrainData.heightmapTexture));
+            cmd.SetComputeIntParam(generateCS, "TerrainHeightMapResolution",
+                mainTerrain.terrainData.heightmapResolution);
+            
+        }
+        public override void OnCameraCleanup(CommandBuffer cmd)
         {
         }
 
@@ -64,9 +157,8 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             cmd.BeginSample("PlacementRenderer");
             foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
             {
-                InitSamplePointBuffer(foliageDataAndFootprint.Key);
-                InitPointCloudBuffer(foliageDataAndFootprint.Value);
-                RunPipelines(cmd, context, foliageDataAndFootprint.Value);
+                InitPointCloudBufferList(foliageDataAndFootprint.Value.Count, samplePointBufferDict[foliageDataAndFootprint.Key].count);
+                RunPipelines(cmd, context, foliageDataAndFootprint.Key);
                 DrawIndirect(cmd, context, foliageDataAndFootprint.Value);
             }
 
@@ -75,114 +167,58 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             context.ExecuteCommandBuffer(cmd);
             cmd.Release();
         }
-
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-        }
-
-        private void InitSamplePointBuffer(float foliageDataFootprint)
-        {
-            List<SamplePoint> samplePoints = new List<SamplePoint>();
-            List<Vector2> poissonUVs = null;
-            if (Math.Abs(foliageDataFootprint - 1.0f) < Mathf.Epsilon)
-            {
-                poissonUVs = poissonDiskSampler.Get10000Points();
-            }
-            else if (Math.Abs(foliageDataFootprint - 2.0f) < Mathf.Epsilon)
-            {
-                poissonUVs = poissonDiskSampler.Get2500Points();
-            }
-            else if (Math.Abs(foliageDataFootprint - 4.0f) < Mathf.Epsilon)
-            {
-                poissonUVs = poissonDiskSampler.Get500Points();
-            }
-
-            if (poissonUVs == null)
-            {
-                return;
-            }
-
-            foreach (Vector2 pos in poissonUVs)
-            {
-                SamplePoint samplePoint = new SamplePoint
-                {
-                    densityMapUV = pos
-                };
-                samplePoint.heightMapUV = samplePoint.densityMapUV;
-                samplePoint.threshold = 0.8f;
-                samplePoints.Add(samplePoint);
-            }
-            
-            samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 7); //todo : 매번 new 하지 않아도 되고, Sample Point 종류마다만 있으면 될 듯. 
-            samplePointBuffer.SetData(samplePoints);
-            
-            
-        }
         
-        private void InitPointCloudBuffer(List<FoliageData> foliageData)
+        private void InitPointCloudBufferList(int cloudBufferCount, int instanceCount)
         {
-            pointCloudBufferList.Clear();
-            for (int i = 0; i < foliageData.Count; i++)
+            pointCloudBufferList.Clear(); //todo 이거 꼭 new 해야해? 재사용 불가능? 
+            for (int i = 0; i < cloudBufferCount; i++)
             {
-                pointCloudBufferList.Add(new ComputeBuffer(samplePointBuffer.count, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
+                pointCloudBufferList.Add(new ComputeBuffer(instanceCount, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
             }
         }
 
-        private void RunPipelines(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData)
+        private void RunPipelines(CommandBuffer cmd, ScriptableRenderContext context, int footprint)
         {
             int generateCSMain = generateCS.FindKernel("CSMain");
-
-            cmd.SetComputeFloatParam(generateCS, "TerrainWidth", mainTerrain.terrainData.size.x);
-            cmd.SetComputeFloatParam(generateCS, "TerrainHeight", mainTerrain.terrainData.heightmapScale.y);
-            cmd.SetComputeFloatParam(generateCS, "TerrainLength", mainTerrain.terrainData.size.z);
             
-            cmd.SetComputeTextureParam(generateCS, generateCSMain, "TerrainHeightMap",
-                new RenderTargetIdentifier(mainTerrain.terrainData.heightmapTexture));
-            cmd.SetComputeIntParam(generateCS, "TerrainHeightMapResolution",
-                mainTerrain.terrainData.heightmapResolution);
+            //1. Set Foliage Data Info
+            cmd.SetComputeIntParam(generateCS, "FoliageDataCount", foliageComputeBufferDataDict[footprint].count);
+            cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliageData", foliageComputeBufferDataDict[footprint]);
 
-            ComputeBuffer foliageDataComputeBuffer = new ComputeBuffer(foliageData.Count, sizeof(int) * 1 + sizeof(float) * 6);
-            List<FoliageComputeBufferData> foliageComputeBufferDataList = new List<FoliageComputeBufferData>(); 
-            Texture2DArray densityMapArray = new Texture2DArray(foliageData[0].DensityMap.width,
-                foliageData[0].DensityMap.height, foliageData.Count, foliageData[0].DensityMap.format, false);
-            densityMapArray.filterMode = foliageData[0].DensityMap.filterMode;
-            densityMapArray.wrapMode = foliageData[0].DensityMap.wrapMode;
-            for(int i = 0; i < foliageData.Count; i++)
-            {
-                FoliageData item = foliageData[i];
-                FoliageComputeBufferData fcbd = new FoliageComputeBufferData()
-                {
-                    densityMapResolution = item.DensityMap.width,
-                    foliageScale = item.FoliageScale,
-                    zitterScale = item.FoliageScale * 0.1f
-                };
-                foliageComputeBufferDataList.Add(fcbd);
-                
-                densityMapArray.SetPixels(item.DensityMap.GetPixels(0), i, 0);
-            }
-            foliageDataComputeBuffer.SetData(foliageComputeBufferDataList);
-            cmd.SetComputeIntParam(generateCS, "FoliageDataCount", foliageDataList.Count);
-            cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliageData", foliageDataComputeBuffer);
+            //2. Set Density Maps
+            // List<FoliageData> currentFoliageDataList = foliageDataByFootprint[footprint];
+            // Texture2DArray densityMapArray = new Texture2DArray(currentFoliageDataList[0].DensityMap.width,
+            //     currentFoliageDataList[0].DensityMap.height, currentFoliageDataList.Count,
+            //     currentFoliageDataList[0].DensityMap.format, false);
+            // densityMapArray.filterMode = currentFoliageDataList[0].DensityMap.filterMode;
+            // densityMapArray.wrapMode = currentFoliageDataList[0].DensityMap.wrapMode;
+            // for (int i = 0; i < currentFoliageDataList.Count; i++)
+            // {
+            //     FoliageData item = currentFoliageDataList[i];
+            //     densityMapArray.SetPixels(item.DensityMap.GetPixels(0), i, 0);
+            //     // Debug.Log("SetPixels");
+            // }
+            // densityMapArray.Apply();
+            cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap", new RenderTargetIdentifier(mainTerrain.terrainData.GetAlphamapTexture(0)));
 
-            densityMapArray.Apply();
-            cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMaps",
-                new RenderTargetIdentifier(densityMapArray));
-
-            cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBuffer);
+            //3. Set Sample Points
+            cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBufferDict[footprint]);
+            
+            //4. Set Output Buffer
             for (int i = 0; i < pointCloudBufferList.Count; i++)
             {
                 cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), pointCloudBufferList[i]);
                 cmd.SetBufferCounterValue(pointCloudBufferList[i], 0);
             }
-
             for (int i = pointCloudBufferList.Count; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
             {
                 ComputeBuffer temp = new ComputeBuffer(1, 4);
                 cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), temp);
             }
             
+            //5. Dispatch 
             cmd.DispatchCompute(generateCS, generateCSMain,
-                Mathf.CeilToInt((float)samplePointBuffer.count / 64), 1, 1);
+                Mathf.CeilToInt((float)samplePointBufferDict[footprint].count / 64), 1, 1);
             
             // cmd.RequestAsyncReadback(pointCloudBufferList[0], (AsyncGPUReadbackRequest request) =>
             // {
@@ -191,15 +227,14 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             //     foreach (FoliagePoint point in points)
             //     {
             //         Vector3 pos = new Vector3(point.TRSMat.m03, point.TRSMat.m13, point.TRSMat.m23);
-            //         // Debug.Log("Pos : " + pos);
-            //         if(Vector3.SqrMagnitude(pos - Vector3.zero) < Mathf.Epsilon)
-            //         {
-            //             zeroCount++;
-            //         }
+            //         Debug.Log("Pos : " + pos);
+            //         // if(Vector3.SqrMagnitude(pos - Vector3.zero) < Mathf.Epsilon)
+            //         // {
+            //         //     zeroCount++;
+            //         // }
             //     }
-            //     Debug.Log("zero : " + zeroCount);
+            //     // Debug.Log("zero : " + zeroCount);
             // });
-            
             // int placementCSMain = placementCS.FindKernel("CSMain");
             // cmd.SetComputeBufferParam(placementCS, placementCSMain,"foliagePoints", pointCloudBuffer);
             // cmd.DispatchCompute(placementCS, placementCSMain, pointCloudBuffer.count / 64,1,1);
@@ -233,44 +268,6 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             }
         }
 
-        private void FillDummySamplePointData()
-        {
-            List<SamplePoint> samplePoints = new List<SamplePoint>();
-            // for (int i = 0; i < instanceCount; i++)
-            // {
-            //     SamplePoint samplePoint = new SamplePoint
-            //     {
-            //         // densityMapUV = new Vector2(1.0f / (float)instanceCount * i, 1.0f / (float)instanceCount * i)
-            //         densityMapUV = new Vector2(Random.value, Random.value)
-            //     };
-            //     samplePoint.heightMapUV = samplePoint.densityMapUV;
-            //     samplePoint.threshold = 0.8f;
-            //     samplePoints.Add(samplePoint);
-            //
-            //     // float x = samplePoint.heightMapUV.x * mainTerrain.terrainData.size.z;
-            //     // float y = samplePoint.heightMapUV.y * mainTerrain.terrainData.size.z;
-            //     // float terrainHeight = mainTerrain.SampleHeight(new Vector3(x, 0.0f, y));
-            //     // Debug.Log(
-            //     //     $" height : {terrainHeight}" +
-            //     //     $" x : {x}, y : {y}");
-            // }
-
-            for (int i = 0; i < instanceCountSqrt; i++)
-            {
-                for (int j = 0; j < instanceCountSqrt; j++)
-                {
-                    SamplePoint samplePoint = new SamplePoint
-                    {
-                        densityMapUV = new Vector2((float)i / instanceCountSqrt, (float)j / instanceCountSqrt)
-                    };
-                    samplePoint.heightMapUV = samplePoint.densityMapUV;
-                    samplePoint.threshold = 0.8f;
-                    samplePoints.Add(samplePoint);
-                }
-            }
-
-            samplePointBuffer.SetData(samplePoints);
-        }
     }
 
     struct FoliagePoint
@@ -299,19 +296,15 @@ public class PlacementRendererFeature : ScriptableRendererFeature
     [SerializeField]
     private List<FoliageData> foliageDataList;
     [SerializeField]
-    private Texture2D discretedDensityMap;
-    [SerializeField]
     private ComputeShader placementCS;
     [SerializeField]
     private ComputeShader generateCS;
-    [SerializeField] 
-    // private Terrain mainTerrain;
-    /// <inheritdoc/>
+    
     public override void Create()
     {
         if (Terrain.activeTerrain != null)
         {
-            m_ScriptablePass = new CustomRenderPass(foliageDataList, placementCS, generateCS, Terrain.activeTerrain, discretedDensityMap);
+            m_ScriptablePass = new CustomRenderPass(foliageDataList, placementCS, generateCS, Terrain.activeTerrain);
             m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
         }
     }
