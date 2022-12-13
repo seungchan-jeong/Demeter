@@ -7,7 +7,10 @@ float TerrainHeight;
 int TerrainHeightMapResolution;
 Texture2D<float4> TerrainHeightMap; //Todo float4 -> float1
 
-Texture2D<float4> DensityMap;
+Texture2D<float4> DensityMap01;
+Texture2D<float4> DensityMap02;
+Texture2D<float4> DensityMap03;
+Texture2D<float4> DensityMap04;
 struct FoliageData
 {
     int DensityMapResolution;
@@ -113,13 +116,14 @@ float4x4 trs(float3 position, float4 quat, float3 scale)
 [numthreads(64,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
 {
+    Texture2D DensityMapArray[] = {DensityMap01, DensityMap02, DensityMap03, DensityMap04}; //오..!
     int targetIndex = groupIndex + groupID.x * 64;
     SamplePoint samplePoint = samplePoints[targetIndex];
 
     float densitySum = 0.0f;
     for(int i = 0 ; i < FoliageDataCount; i++)
     {
-        densitySum += DensityMap[uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][1];
+        densitySum += DensityMapArray[i][uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][0];
     }
     
     if(densitySum > samplePoint.threshold)
@@ -133,7 +137,7 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
 
         for(int i = 0 ; i < FoliageDataCount; i++)
         {
-            float normalizedDensity = DensityMap[uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][1] / densitySum;
+            float normalizedDensity = DensityMapArray[i][uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][0] / densitySum;
             if(randRange - normalizedDensity <= randFloat && randFloat < randRange)
             {
                 choosenFoliageIndex = i;
@@ -150,12 +154,14 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, ui
             terrainWorldHeight, TerrainLength * samplePoint.heightMapUV.y);
          
         foliagePoint.TRSMat = trs(worldPosition, float4(0.0f, 0.0f, 0.0f, 1.0f), foliageData[choosenFoliageIndex].FoliageScale + scaleZitter);
-
         
         //2. samplePoint에서의 worldNormal 계산
         //
 
         //3. out Append
+        // AppendStructuredBuffer<FoliagePoint> foliagePointArray[] = {foliagePoints01, foliagePoints02, foliagePoints03, foliagePoints04};
+        // foliagePointArray[choosenFoliageIndex].Append(foliagePoint);
+        
         if(choosenFoliageIndex == 0)
         {
             foliagePoints01.Append(foliagePoint);

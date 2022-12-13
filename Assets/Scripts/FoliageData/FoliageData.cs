@@ -11,6 +11,8 @@ public class FoliageData : ScriptableObject
     private Vector3 foliageScale;
     [SerializeField]
     private float footprint;
+    [SerializeField]
+    private Texture2D densityMap;
     public Mesh FoliageMesh
     {
         get
@@ -49,12 +51,7 @@ public class FoliageData : ScriptableObject
     {
         get
         {
-            //Temp Code below
-            if (Terrain.activeTerrain == null)
-            {
-                return null;
-            }
-            return Terrain.activeTerrain.terrainData.GetAlphamapTexture(0);
+            return densityMap;
         }
     }
 

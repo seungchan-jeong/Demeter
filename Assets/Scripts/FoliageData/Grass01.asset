@@ -16,3 +16,4 @@ MonoBehaviour:
     type: 3}
   foliageScale: {x: 1, y: 1, z: 1}
   footprint: 1
+  densityMap: {fileID: 2800000, guid: b9bf8fdf629435049b3d941b7a419cb8, type: 3}

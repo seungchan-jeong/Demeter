@@ -188,20 +188,17 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliageData", foliageComputeBufferDataDict[footprint]);
 
             //2. Set Density Maps
-            // List<FoliageData> currentFoliageDataList = foliageDataByFootprint[footprint];
-            // Texture2DArray densityMapArray = new Texture2DArray(currentFoliageDataList[0].DensityMap.width,
-            //     currentFoliageDataList[0].DensityMap.height, currentFoliageDataList.Count,
-            //     currentFoliageDataList[0].DensityMap.format, false);
-            // densityMapArray.filterMode = currentFoliageDataList[0].DensityMap.filterMode;
-            // densityMapArray.wrapMode = currentFoliageDataList[0].DensityMap.wrapMode;
-            // for (int i = 0; i < currentFoliageDataList.Count; i++)
-            // {
-            //     FoliageData item = currentFoliageDataList[i];
-            //     densityMapArray.SetPixels(item.DensityMap.GetPixels(0), i, 0);
-            //     // Debug.Log("SetPixels");
-            // }
-            // densityMapArray.Apply();
-            cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap", new RenderTargetIdentifier(mainTerrain.terrainData.GetAlphamapTexture(0)));
+            for (int i = 0; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
+            {
+                if (i < foliageDataByFootprint[footprint].Count)
+                {
+                    cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(foliageDataByFootprint[footprint][i].DensityMap));
+                }
+                else
+                {
+                    cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier("Temp"));
+                }
+            }
 
             //3. Set Sample Points
             cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBufferDict[footprint]);
