@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3a42c538-3db6-4d22-b6fd-d295f85b3fdc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Cube BrushCollection.asset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Cube BrushCollection.asset.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Sphere BrushCollection.asset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Sphere BrushCollection.asset.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Demo.unity" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Demo.unity.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/GameObject Brush v3.3.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/GameObject Brush v3.3.pdf.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Blue.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Blue.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Default.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Default.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Green.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Green.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Red.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Red.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Yellow.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Yellow.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Blue.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Blue.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Green.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Green.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Red.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Red.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Yellow.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Yellow.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Multi Object Prefab.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Multi Object Prefab.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Blue.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Blue.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Green.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Green.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Red.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Red.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Yellow.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Yellow.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/AddObjectPopup.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/AddObjectPopup.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushCollection.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushCollection.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushObject.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushObject.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/GameObjectBrushEditor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/GameObjectBrushEditor.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/StringPopupDialog.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/StringPopupDialog.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Materials.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Grass01DensityMap.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Grass01DensityMap.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree01DensityMap.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree01DensityMap.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree02DensityMap.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree02DensityMap.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree03DensityMap.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree03DensityMap.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scenes/BrushToolTest.unity" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scenes/BrushToolTest.unity.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderPreviewUnderCursor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderPreviewUnderCursor.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderWithTerrainUIGroup.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderWithTerrainUIGroup.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/PlacementBrushUIGroup.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/PlacementBrushUIGroup.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/DensityMapTool.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/DensityMapTool.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ReadPixelTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ReadPixelTest.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Shader.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Shader/Brush.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Shader/Brush.shader.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/IndirectDrawMaterial.shader" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/IndirectDrawMaterial.shader" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/IndirectDrawMaterial.shader.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/IndirectDrawMaterial.shader.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/New Terrain.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/New Terrain.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/NewLayer.terrainlayer" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/NewLayer.terrainlayer.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/OpaqueUI.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/OpaqueUI.mat.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.shader" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/OpaqueUI.shader" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.shader.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/OpaqueUI.shader.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/DensityMaps/SampleDensity01.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/SampleDensity01.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Prototype.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Prototype.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateCS.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateCS.compute" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/FoliageData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/FoliageData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Grass01.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Grass01.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree01.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree01.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree02.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree02.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree03.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree03.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/0c/2d5eaa3c/IOnSceneGUI.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/4a/a2f275c9/TerrainInspector.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/51/68757426/ITerrainPaintTool.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/5e/9ae64aa0/CreateTerrainTool.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/70/8f17c007/TerrainPaintUtilityEditor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/88/340d8be1/OnSceneGUIContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/88/f28a15a1/TerrainEditorUtility.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/c2/76ef2be8/HostView.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/c7/976e0105/Editor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/e7/3aef0def/PaintDetailsTool.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0d6ce211ebbc47e1a35a84c3672ff58f813800/e7/eb292a98/Handles.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/01/d40c5c6f/LocalKeyword.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/0d/5d3faa9f/GraphicsFormat.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/19/1e8d78b2/SystemInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/1f/6f67daac/Quaternion.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/20/9d1e9bba/TextureFormat.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/27/45d3272c/RenderTextureReadWrite.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/57/800781c8/Vector2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/59/3182c73a/Graphics.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/70/e4cb53d5/AsyncGPUReadbackRequest.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/78/7895b6d2/ComputeBuffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/79/6cd3f072/Texture.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/82/7f41849f/MeshFilter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/8b/c99b89fa/SubMeshDescriptor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/a5/3dad1854/MeshTopology.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/a9/12cd6679/Texture2DArray.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/b4/41aaaa77/Material.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/c1/0dc0825b/RenderTexture.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/c4/3a913652/ScriptableObject.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/cb/413ad6af/Mesh.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/dc/5b64c44b/Texture2D.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/e0/58310930/Vector3.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/e7/36a05267/CommandBuffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/60/f08c114e/MethodImplOptions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5bc94083d92047f08665a603a5ffe2f312a400/9b/60c6cf22/IMGUIContainer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8cb8bce468c64351ae8c390df9a4c1175c00/4d/330c3116/UsedByNativeCodeAttribute.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9aad1b3a47484d63ba2b3985692d80e946a800/0b/348c9133/Buffer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9aad1b3a47484d63ba2b3985692d80e946a800/2a/e7b7ad33/Activator.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9aad1b3a47484d63ba2b3985692d80e946a800/76/f7de5f08/KeyValuePair`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9aad1b3a47484d63ba2b3985692d80e946a800/e5/5c30e9f9/String.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d4cc42a5570646068a74ddfe2da46f0e16200/2c/33aa2975/TerrainData.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d4cc42a5570646068a74ddfe2da46f0e16200/55/41d08604/BrushTransform.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d4cc42a5570646068a74ddfe2da46f0e16200/5b/24994b04/Terrain.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/0d/94d87654/GUILayoutOption.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/12/764f6d31/GUIContent.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/43/e8521681/GUIStyle.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/74/5ccba1ea/GUILayout.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/8f/4c81897c/PointerType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/ca/0dd483b8/EventType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d59d8804614742ee9ed4e907c79998b129200/db/bc406440/Event.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3ea01e77be99618395f448b16bd7cc2bd4248bd9e5d8474964b2d97f39c5d74/System.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/GameObjectBrushEditor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/DensityMapCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/DiscretizeCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/DrawCircleCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/IndirectDrawCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/PlacementCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderPreviewUnderCursor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderWithTerrainUIGroup.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Discretize.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Editor/DensityMapTool.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/FoliageData/FoliageData.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/PoissonDiskSampler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ReadPixelTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ShaderFunction/IndirectPos.hlsl" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ShowHeightmap.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.core@12.1.7/Editor/Debugging/DebugWindow.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.core@12.1.7/Runtime/Utilities/ResourceReloader.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.core@12.1.7/ShaderLibrary/API/D3D11.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Editor/ShaderGUI/TerrainLitShaderGUI.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Runtime/Data/PostProcessData.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Runtime/Passes/PostProcessPass.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Runtime/ScriptableRenderer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Runtime/UniversalRenderPipeline.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/ShaderLibrary/Core.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Shaders/LitForwardPass.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Shaders/Terrain/TerrainLitInput.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Shaders/Terrain/TerrainLitMetaPass.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Shaders/Terrain/TerrainLitPasses.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@12.1.7/Shaders/Utils/Fullscreen.hlsl" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.shadergraph@12.1.7/Editor/Data/Nodes/Input/Texture/Texture2DArrayAssetNode.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainToolbox/TerrainToolboxUtilities.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/BaseBrushUIGroup.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/BrushRenderUIGroupUnderCursor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/BrushRenderWithTerrainUiGroup.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/DefaultBrushUIGroup.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/IBrushEventHandler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/IBrushRenderUnderCursor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/IBrushRenderWithTerrain.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/IBrushTerrainCache.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/BrushControllers/IBrushUIGroup.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/PaintHeightTool.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/PaintHolesTool.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/TerrainToolUtility.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.terrain-tools@4.0.3/Editor/TerrainTools/WindErosionTool.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/RawImage.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Fk5Bt0mBciC2rJFCOPsiP1t2oy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Discover.Launch.Via.Unity&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.49758455&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;rider.run.widget.enabled.cache&quot;: &quot;false&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+    <configuration name="UnitTests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2021.3.9f1\Editor\Unity.exe" />
+      <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath C:\Users\seungchan.jeong\Demeter -testResults Logs/results.xml -testPlatform EditMode -debugCodeOptimization" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\seungchan.jeong\Demeter" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3a42c538-3db6-4d22-b6fd-d295f85b3fdc" name="Changes" comment="" />
+      <created>1665023110916</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1665023110916</updated>
+      <workItem from="1665023116882" duration="15967000" />
+      <workItem from="1665736953311" duration="2192000" />
+      <workItem from="1665968617556" duration="65811000" />
+      <workItem from="1666342170441" duration="10324000" />
+      <workItem from="1666578186002" duration="40423000" />
+      <workItem from="1666776982276" duration="42374000" />
+      <workItem from="1667193212996" duration="14734000" />
+      <workItem from="1667351756629" duration="893000" />
+      <workItem from="1667352680038" duration="46700000" />
+      <workItem from="1667552838924" duration="2382000" />
+      <workItem from="1668738193012" duration="1263000" />
+      <workItem from="1668790303239" duration="127000" />
+      <workItem from="1669779139664" duration="3997000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
