@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a31cad206455ac4cb79fe2e1d9ed6bc, type: 3}
   m_Name: Tree01
   m_EditorClassIdentifier: 
-  foliageMesh: {fileID: 0}
-  footprint: 0
+  foliagePrefab: {fileID: 5263304828636225187, guid: 5a9a16f5e050ede49a152edfd1db9fbd,
+    type: 3}
+  footprint: 1

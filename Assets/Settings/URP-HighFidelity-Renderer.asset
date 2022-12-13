@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlacementRendererFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  cube: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  foliageData: {fileID: 11400000, guid: 23d3232f60781d840bffbf29c40c22a9, type: 2}
   discretedDensityMap: {fileID: 2800000, guid: 04b31c632273eb44a8d8f0f96555e705, type: 3}
   indirectMaterial: {fileID: 2100000, guid: ffdc1c2de0afe534ea69019537b7f8c8, type: 2}
   placementCS: {fileID: 7200000, guid: 10883e7cee804f3489063a66b06ff916, type: 3}

@@ -8,38 +8,33 @@ public class PlacementRendererFeature : ScriptableRendererFeature
     class CustomRenderPass : ScriptableRenderPass
     {
         private Terrain mainTerrain;
-        private Mesh cube;
+        private FoliageData foliageData;
         private Texture2D discretedDensityMap;
 
         private ComputeBuffer samplePointBuffer;
         private ComputeBuffer pointCloudBuffer;
         
-        private ComputeBuffer argsBuffer;
         private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
-        private int instanceCountSqrt = 50;
-        private int subMeshIndex = 0;
-        
+        private int instanceCountSqrt = 25;
+
         private ComputeShader generateCS;
         private ComputeShader placementCS;
-        private Material indirectMaterial;
-
-        public CustomRenderPass(Mesh cube, Material indirectMaterial, ComputeShader placementCS, ComputeShader generateCS, Terrain mainTerrain, Texture2D discretedDensityMap)
+        
+        public CustomRenderPass(FoliageData foliageData, ComputeShader placementCS, ComputeShader generateCS, Terrain mainTerrain, Texture2D discretedDensityMap)
         {
-            this.cube = cube;
-            this.indirectMaterial = indirectMaterial;
+            this.foliageData = foliageData;
             this.placementCS = placementCS;
             this.generateCS = generateCS;
             this.mainTerrain = mainTerrain;
             // this.discretedDensityMap = discretedDensityMap;
             this.discretedDensityMap = mainTerrain.terrainData.GetAlphamapTexture(0);
             
-            argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
             //이거 크기를 그냥 크게 만들어두는건가? Compute Shader에서 실제 채워지는 양이 다르면 어떻게 처리? 
-            pointCloudBuffer = new ComputeBuffer(instanceCountSqrt * instanceCountSqrt, sizeof(float) * 3 * 2 + sizeof(int));
+            pointCloudBuffer = new ComputeBuffer(instanceCountSqrt * instanceCountSqrt, sizeof(float) * 19 + sizeof(int));
             samplePointBuffer = new ComputeBuffer(instanceCountSqrt * instanceCountSqrt, sizeof(float) * 7);
             
-            FillSamplePointWithPoissonDisk();
-            // FillDummySamplePointData();
+            // FillSamplePointWithPoissonDisk();
+            FillDummySamplePointData();
         }
         
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
@@ -85,7 +80,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             //     FoliagePoint[] points = request.GetData<FoliagePoint>(0).ToArray();
             //     foreach (FoliagePoint point in points)
             //     {
-            //         Debug.Log("Pos : " + point.worldPosition);
+            //         Debug.Log("Pos : " + new Vector3(point.TRSMat.m03, point.TRSMat.m13, point.TRSMat.m23));
             //     }
             // });
             
@@ -105,20 +100,23 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context)
         {
-            if (cube != null) {
-                args[0] = (uint)cube.GetIndexCount(subMeshIndex);
-                args[1] = (uint)instanceCountSqrt * (uint)instanceCountSqrt;
-                args[2] = (uint)cube.GetIndexStart(subMeshIndex);
-                args[3] = (uint)cube.GetBaseVertex(subMeshIndex);
-            }
-            argsBuffer.SetData(args);
-
-            if (indirectMaterial != null)
+            Material[] foliageMaterials = foliageData.FoliageMaterials;
+            for (int subMeshIndex = foliageData.FoliageMesh.subMeshCount-1; subMeshIndex >= 0; subMeshIndex--)
             {
-                indirectMaterial.SetBuffer("_PointCloudBuffer", pointCloudBuffer);
-                cmd.DrawMeshInstancedIndirect(cube, 0, indirectMaterial, 0, argsBuffer);
-            }
+                if (foliageData.FoliageMesh != null) {
+                    args[0] = (uint)foliageData.FoliageMesh.GetIndexCount(subMeshIndex);
+                    args[1] = (uint)instanceCountSqrt * (uint)instanceCountSqrt;
+                    args[2] = (uint)foliageData.FoliageMesh.GetIndexStart(subMeshIndex);
+                    args[3] = (uint)foliageData.FoliageMesh.GetBaseVertex(subMeshIndex);
             
+                    ComputeBuffer argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
+                    argsBuffer.SetData(args);
+                
+                    foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBuffer);
+                    cmd.DrawMeshInstancedIndirect(foliageData.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex], 0, argsBuffer);
+                    
+                }
+            }
         }
 
         private void FillDummySamplePointData()
@@ -2667,8 +2665,14 @@ new Vector2(0.0139775f,0.0860012f),
 new Vector2(0.953795f,0.184179f)
             };
 
+            // int count = 0;
             foreach (Vector2 pos in poissonPos)
             {
+                // if (count >= instanceCountSqrt * instanceCountSqrt)
+                // {
+                //     break;
+                // }
+
                 SamplePoint samplePoint = new SamplePoint
                 {
                     densityMapUV = pos
@@ -2700,7 +2704,7 @@ new Vector2(0.953795f,0.184179f)
 
     struct FoliagePoint
     {
-        public Vector3 worldPosition;
+        public Matrix4x4 TRSMat;
         public Vector3 worldNormal;
         public int foliageType;
     }
@@ -2715,11 +2719,9 @@ new Vector2(0.953795f,0.184179f)
     
     CustomRenderPass m_ScriptablePass;
     [SerializeField]
-    private Mesh cube;
+    private FoliageData foliageData;
     [SerializeField]
     private Texture2D discretedDensityMap;
-    [SerializeField]
-    private Material indirectMaterial;
     [SerializeField]
     private ComputeShader placementCS;
     [SerializeField]
@@ -2729,7 +2731,7 @@ new Vector2(0.953795f,0.184179f)
     /// <inheritdoc/>
     public override void Create()
     {
-        m_ScriptablePass = new CustomRenderPass(cube, indirectMaterial, placementCS, generateCS, Terrain.activeTerrain, discretedDensityMap);
+        m_ScriptablePass = new CustomRenderPass(foliageData, placementCS, generateCS, Terrain.activeTerrain, discretedDensityMap);
         m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
     }
 
