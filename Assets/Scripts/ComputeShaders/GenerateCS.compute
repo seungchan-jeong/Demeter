@@ -1,0 +1,53 @@
+#pragma kernel CSMain
+
+float TerrainWidth;
+float TerrainLength;
+float TerrainHeight;
+
+int DensityMapResolution;
+Texture2D<float4> DensityMap;
+
+int TerrainHeightMapResolution;
+Texture2D<float4> TerrainHeightMap; //Todo float4 -> float1
+
+struct SamplePoint
+{
+    float2 bayerMatrixUV;
+    float2 densityMapUV;
+    float2 heightMapUV;
+    float threshold;
+};
+StructuredBuffer<SamplePoint> samplePoints; 
+struct FoliagePoint
+{
+    float3 worldPosition;
+    float3 worldNormal;
+    int foliageType;
+};
+RWStructuredBuffer<FoliagePoint> foliagePoints;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
+{
+    int targetIndex = groupIndex + groupID.x * 64;
+    SamplePoint samplePoint = samplePoints[targetIndex];
+    float density = DensityMap[samplePoint.densityMapUV * DensityMapResolution].g;
+
+    if(density > samplePoint.threshold)
+    {
+        //1. samplePoint에서의 worldPosition 계산
+        FoliagePoint foliagePoint = (FoliagePoint)0;
+        float terrainWorldHeight = TerrainHeightMap[samplePoint.heightMapUV * TerrainHeightMapResolution] * TerrainHeight * 2.0f; //To Do : 이거 왜 2배 해야함??
+
+        foliagePoint.worldPosition = float3(TerrainWidth * samplePoint.heightMapUV.x,
+            terrainWorldHeight, TerrainLength * samplePoint.heightMapUV.y);
+        
+        //2. samplePoint에서의 worldNormal 계산
+        
+        foliagePoints[targetIndex] = foliagePoint;
+    }
+    else
+    {
+        foliagePoints[targetIndex] = (FoliagePoint)0;
+    }
+}

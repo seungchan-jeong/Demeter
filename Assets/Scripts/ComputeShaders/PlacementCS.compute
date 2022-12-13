@@ -1,0 +1,42 @@
+#pragma kernel CSMain
+
+struct FoliagePoint
+{
+    float3 worldPosition;
+    float3 worldNormal;
+    int foliageType;
+};
+
+RWStructuredBuffer<FoliagePoint> foliagePoints;
+
+// https://github.com/keijiro/ComputePrngTest/blob/master/Assets/Prng.compute
+// Hash function from H. Schechter & R. Bridson, goo.gl/RXiKaH
+uint Hash(uint s)
+{
+    s ^= 2747636419u;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    return s;
+}
+
+float Random(uint seed)
+{
+    return float(Hash(seed)) / 4294967295.0; // 2^32-1
+}
+
+[numthreads(4,4,4)]
+void CSMain (uint3 id : SV_DispatchThreadID, uint groupID : SV_GroupIndex)
+{
+    float sphereRadius = 5;
+    float x = Random(id.x) * sphereRadius;
+    float y = Random(id.y) * sphereRadius;
+    float z = Random(id.z) * sphereRadius;
+    // float x = Random(id.x);
+    
+    foliagePoints[groupID].worldPosition = float3(x, y, z);
+    foliagePoints[groupID].worldNormal = float3(0, 1, 0);
+    foliagePoints[groupID].foliageType = 0;
+}
