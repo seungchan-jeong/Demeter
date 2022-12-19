@@ -25,7 +25,7 @@ public class PlacementOnMeshRendererFeature : ScriptableRendererFeature
 
         private PoissonDiskSampler poissonDiskSampler;
 
-        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, PlacableObject debugPlacableObject)
+        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, params PlacableObject[] debugPlacableObject)
         {
             this.foliageDataList = foliageDataList;
             this.placementCS = placementCS;
@@ -43,7 +43,7 @@ public class PlacementOnMeshRendererFeature : ScriptableRendererFeature
             
             // InitPlacableTargetObjects();
             placeTargetObjects = new List<PlacableObject>();
-            placeTargetObjects.Add(debugPlacableObject);
+            placeTargetObjects.AddRange(debugPlacableObject);
         }
 
         private void InitFoliageDictionary()
@@ -187,8 +187,7 @@ public class PlacementOnMeshRendererFeature : ScriptableRendererFeature
                 cmd.SetComputeBufferParam(generateCS, generateCSMain, "meshUVs", uvs);
                 cmd.SetComputeBufferParam(generateCS, generateCSMain, "meshVerts", verts);
                 cmd.SetComputeMatrixParam(generateCS, "meshLocalToWorldMat", placeTargetObject.transform.localToWorldMatrix);
-                Debug.Log("Mat : " + placeTargetObject.transform.localToWorldMatrix.ToString());
-                
+
                 foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
                 {
                     InitPointCloudBufferList(foliageDataAndFootprint.Value.Count, samplePointBufferDict[foliageDataAndFootprint.Key].count);
@@ -250,17 +249,6 @@ public class PlacementOnMeshRendererFeature : ScriptableRendererFeature
             //5. Dispatch 
             cmd.DispatchCompute(generateCS, generateCSMain,
                 Mathf.CeilToInt((float)samplePointBufferDict[footprint].count / 64), 1, 1);
-            
-            // cmd.RequestAsyncReadback(pointCloudBufferList[0], (AsyncGPUReadbackRequest request) =>
-            // {
-            //     FoliagePoint[] points = request.GetData<FoliagePoint>(0).ToArray();
-            //     Debug.Log("Length : "+points.Length);
-            //     foreach (var point in points)
-            //     {
-            //         Debug.Log(new Vector3(point.TRSMat.m03, point.TRSMat.m13, point.TRSMat.m23).ToString());
-            //     }
-            // });
-            
         }
 
         private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData)
@@ -282,7 +270,7 @@ public class PlacementOnMeshRendererFeature : ScriptableRendererFeature
                             ComputeBufferType.IndirectArguments);
                         argsBuffer.SetData(args);
                         cmd.CopyCounterValue(pointCloudBufferList[i], argsBuffer, sizeof(uint));
-
+                        
                         foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferList[i]);
                         cmd.DrawMeshInstancedIndirect(item.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex],
                             0, argsBuffer);
@@ -329,7 +317,7 @@ public class PlacementOnMeshRendererFeature : ScriptableRendererFeature
     //
     public override void Create()
     {
-        m_ScriptablePass = new CustomRenderPass(foliageDataList, placementCS, generateCS, Resources.FindObjectsOfTypeAll<PlacableObject>()[0]);
+        m_ScriptablePass = new CustomRenderPass(foliageDataList, placementCS, generateCS, Resources.FindObjectsOfTypeAll<PlacableObject>());
         m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
     }
     

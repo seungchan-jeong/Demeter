@@ -6,10 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="3a42c538-3db6-4d22-b6fd-d295f85b3fdc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Demeter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Demeter/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Prototype_OnMesh.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Prototype_OnMesh.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RendererFeature/PlacementOnMeshRendererFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/RendererFeature/PlacementOnMeshRendererFeature.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RendererFeature/PlacementRendererFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/RendererFeature/PlacementRendererFeature.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity-Renderer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity-Renderer.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -195,7 +195,7 @@
       <workItem from="1668790303239" duration="127000" />
       <workItem from="1669779139664" duration="3997000" />
       <workItem from="1671377355535" duration="132000" />
-      <workItem from="1671377511486" duration="15328000" />
+      <workItem from="1671377511486" duration="23346000" />
     </task>
     <servers />
   </component>

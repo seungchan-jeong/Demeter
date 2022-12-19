@@ -9,6 +9,8 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 {
     class CustomRenderPass : ScriptableRenderPass
     {
+        private List<PlacableObject> placeTargetObjects;
+        
         private List<FoliageData> foliageDataList;
         private Dictionary<int, List<FoliageData>> foliageDataByFootprint;
         private Terrain mainTerrain;
@@ -22,15 +24,17 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         private int instanceCountSqrt = 100;
 
         private ComputeShader generateCS;
+        private ComputeShader generateOnMeshCS;
         private ComputeShader placementCS;
 
         private PoissonDiskSampler poissonDiskSampler;
 
-        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, Terrain mainTerrain)
+        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, ComputeShader generateOnMeshCS, Terrain mainTerrain, params PlacableObject[] debugPlacableObject)
         {
             this.foliageDataList = foliageDataList;
             this.placementCS = placementCS;
             this.generateCS = generateCS;
+            this.generateOnMeshCS = generateOnMeshCS;
             this.mainTerrain = mainTerrain;
 
             poissonDiskSampler = new PoissonDiskSampler();
@@ -42,6 +46,9 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             InitFoliageDictionary();
             InitSamplePointBuffer();
             InitFoliageDataBuffer();
+            
+            placeTargetObjects = new List<PlacableObject>();
+            placeTargetObjects.AddRange(debugPlacableObject);
         }
 
         private void InitFoliageDictionary()
@@ -134,6 +141,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             }
         }
 
+        private Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint;
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             int generateCSMain = generateCS.FindKernel("CSMain");
@@ -147,6 +155,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             cmd.SetComputeIntParam(generateCS, "TerrainHeightMapResolution",
                 mainTerrain.terrainData.heightmapResolution);
             
+            pointCloudBufferByFootprint = InitPointCloudBufferByFootprint(cmd, foliageDataByFootprint);
         }
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
@@ -157,89 +166,128 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             CommandBuffer cmd = CommandBufferPool.Get();
 
             cmd.BeginSample("PlacementRenderer");
+
+            foreach (var temp in pointCloudBufferByFootprint)
+            {
+                foreach (var cb in temp.Value)
+                {
+                    cmd.SetBufferCounterValue(cb, 0);
+                }
+            }
+            
             foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
             {
-                InitPointCloudBufferList(foliageDataAndFootprint.Value.Count, samplePointBufferDict[foliageDataAndFootprint.Key].count);
-                RunPipelines(cmd, context, foliageDataAndFootprint.Key);
-                DrawIndirect(cmd, context, foliageDataAndFootprint.Value);
+                RunPipelines(generateCS, cmd, context, foliageDataAndFootprint.Key, pointCloudBufferByFootprint);
             }
 
+            foreach (PlacableObject placeTargetObject in placeTargetObjects)
+            {
+                InitPerMeshParameters(cmd, generateOnMeshCS, placeTargetObject);
+                foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
+                {
+                    RunPipelines(generateOnMeshCS, cmd, context, foliageDataAndFootprint.Key, pointCloudBufferByFootprint);
+                }
+            }
+
+            foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
+            {
+                DrawIndirect(cmd, context, foliageDataAndFootprint.Value, pointCloudBufferByFootprint);
+            }
+            
             cmd.EndSample("PlacementRenderer");
 
             context.ExecuteCommandBuffer(cmd);
             cmd.Release();
         }
         
-        private void InitPointCloudBufferList(int cloudBufferCount, int instanceCount)
+        private void InitPointCloudBufferList(CommandBuffer cmd, int cloudBufferCount, int instanceCount)
         {
             pointCloudBufferList.Clear(); //todo 이거 꼭 new 해야해? 재사용 불가능? 
             for (int i = 0; i < cloudBufferCount; i++)
             {
                 pointCloudBufferList.Add(new ComputeBuffer(instanceCount, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
+                cmd.SetBufferCounterValue(pointCloudBufferList[i], 0);
             }
         }
-
-        private void RunPipelines(CommandBuffer cmd, ScriptableRenderContext context, int footprint)
+        
+        private Dictionary<int, List<ComputeBuffer>> InitPointCloudBufferByFootprint(CommandBuffer cmd, Dictionary<int, List<FoliageData>> inFoliageDataByFootprint)
         {
-            int generateCSMain = generateCS.FindKernel("CSMain");
+            Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint =
+                new Dictionary<int, List<ComputeBuffer>>();
+            foreach (KeyValuePair<int, List<FoliageData>> footprintAndFoliageData in inFoliageDataByFootprint)
+            {
+                List<ComputeBuffer> pointCloudBuffers = new List<ComputeBuffer>();
+                foreach (FoliageData foliageData in footprintAndFoliageData.Value)
+                {
+                    pointCloudBuffers.Add(new ComputeBuffer(samplePointBufferDict[footprintAndFoliageData.Key].count, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
+                }
+                pointCloudBufferByFootprint.Add(footprintAndFoliageData.Key, pointCloudBuffers);
+            }
+
+            return pointCloudBufferByFootprint;
+        }
+        
+        private void InitPerMeshParameters(CommandBuffer cmd, ComputeShader targetShader, PlacableObject placeTargetObject)
+        {
+            int csMain = targetShader.FindKernel("CSMain");
+            
+            Mesh objectMesh = placeTargetObject.GetComponent<MeshFilter>().sharedMesh;
+
+            ComputeBuffer tris = new ComputeBuffer(objectMesh.triangles.Length, sizeof(int));
+            ComputeBuffer uvs = new ComputeBuffer(objectMesh.uv.Length, sizeof(float) * 2);
+            ComputeBuffer verts = new ComputeBuffer(objectMesh.vertices.Length, sizeof(float) * 3);
+            tris.SetData(objectMesh.triangles);
+            uvs.SetData(objectMesh.uv);
+            verts.SetData(objectMesh.vertices);
+            
+            cmd.SetComputeIntParam(targetShader, "meshTrisCount", objectMesh.triangles.Length);
+            cmd.SetComputeBufferParam(targetShader, csMain, "meshTris", tris);
+            cmd.SetComputeBufferParam(targetShader, csMain, "meshUVs", uvs);
+            cmd.SetComputeBufferParam(targetShader, csMain, "meshVerts", verts);
+            cmd.SetComputeMatrixParam(targetShader, "meshLocalToWorldMat", placeTargetObject.transform.localToWorldMatrix);
+        }
+
+        private void RunPipelines(ComputeShader targetShader, CommandBuffer cmd, ScriptableRenderContext context, int footprint, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint)
+        {
+            int generateCSMain = targetShader.FindKernel("CSMain");
             
             //1. Set Foliage Data Info
-            cmd.SetComputeIntParam(generateCS, "FoliageDataCount", foliageComputeBufferDataDict[footprint].count);
-            cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliageData", foliageComputeBufferDataDict[footprint]);
+            cmd.SetComputeIntParam(targetShader, "FoliageDataCount", foliageComputeBufferDataDict[footprint].count);
+            cmd.SetComputeBufferParam(targetShader, generateCSMain, "foliageData", foliageComputeBufferDataDict[footprint]);
 
             //2. Set Density Maps
             for (int i = 0; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
             {
                 if (i < foliageDataByFootprint[footprint].Count)
                 {
-                    cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(foliageDataByFootprint[footprint][i].DensityMap));
+                    cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(foliageDataByFootprint[footprint][i].DensityMap));
                 }
                 else
                 {
-                    cmd.SetComputeTextureParam(generateCS, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier("Temp"));
+                    cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier("Temp"));
                 }
             }
 
             //3. Set Sample Points
-            cmd.SetComputeBufferParam(generateCS, generateCSMain, "samplePoints", samplePointBufferDict[footprint]);
+            cmd.SetComputeBufferParam(targetShader, generateCSMain, "samplePoints", samplePointBufferDict[footprint]);
             
             //4. Set Output Buffer
-            for (int i = 0; i < pointCloudBufferList.Count; i++)
+            for (int i = 0; i < pointCloudBufferByFootprint[footprint].Count; i++)
             {
-                cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), pointCloudBufferList[i]);
-                cmd.SetBufferCounterValue(pointCloudBufferList[i], 0);
+                cmd.SetComputeBufferParam(targetShader, generateCSMain, "foliagePoints0" + (i+1), pointCloudBufferByFootprint[footprint][i]);
             }
-            for (int i = pointCloudBufferList.Count; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
+            for (int i = pointCloudBufferByFootprint[footprint].Count; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
             {
                 ComputeBuffer temp = new ComputeBuffer(1, 4);
-                cmd.SetComputeBufferParam(generateCS, generateCSMain, "foliagePoints0" + (i+1), temp);
+                cmd.SetComputeBufferParam(targetShader, generateCSMain, "foliagePoints0" + (i+1), temp);
             }
             
             //5. Dispatch 
-            cmd.DispatchCompute(generateCS, generateCSMain,
+            cmd.DispatchCompute(targetShader, generateCSMain,
                 Mathf.CeilToInt((float)samplePointBufferDict[footprint].count / 64), 1, 1);
-            
-            // cmd.RequestAsyncReadback(pointCloudBufferList[0], (AsyncGPUReadbackRequest request) =>
-            // {
-            //     FoliagePoint[] points = request.GetData<FoliagePoint>(0).ToArray();
-            //     int zeroCount = 0;
-            //     foreach (FoliagePoint point in points)
-            //     {
-            //         Vector3 pos = new Vector3(point.TRSMat.m03, point.TRSMat.m13, point.TRSMat.m23);
-            //         Debug.Log("Pos : " + pos);
-            //         // if(Vector3.SqrMagnitude(pos - Vector3.zero) < Mathf.Epsilon)
-            //         // {
-            //         //     zeroCount++;
-            //         // }
-            //     }
-            //     // Debug.Log("zero : " + zeroCount);
-            // });
-            // int placementCSMain = placementCS.FindKernel("CSMain");
-            // cmd.SetComputeBufferParam(placementCS, placementCSMain,"foliagePoints", pointCloudBuffer);
-            // cmd.DispatchCompute(placementCS, placementCSMain, pointCloudBuffer.count / 64,1,1);
         }
 
-        private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData)
+        private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint)
         {
             for(int i = 0 ; i < foliageData.Count; i++) //todo foliageData.Count 와 pointCloudBuffer.Count는 항상 같다. 이걸 보장할 방법 찾기. 
             {
@@ -257,9 +305,10 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                         ComputeBuffer argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint),
                             ComputeBufferType.IndirectArguments);
                         argsBuffer.SetData(args);
-                        cmd.CopyCounterValue(pointCloudBufferList[i], argsBuffer, sizeof(uint));
+                        cmd.CopyCounterValue(pointCloudBufferByFootprint[(int)item.Footprint][i], argsBuffer, sizeof(uint)); //임시
+                        /* pointCloudBufferByFootprint의 ComputeBuffer는, 어떤 footprint에 대한 FoliageData를 무작위로 가지고 있을 수 있음. foliageData List의 index와 ComputeBuffer의 index가 서로 맞지 않을 수 있음. */
 
-                        foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferList[i]);
+                        foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferByFootprint[(int)item.Footprint][i]);
                         cmd.DrawMeshInstancedIndirect(item.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex],
                             0, argsBuffer);
                     }
@@ -300,12 +349,15 @@ public class PlacementRendererFeature : ScriptableRendererFeature
     private ComputeShader placementCS;
     [SerializeField]
     private ComputeShader generateCS;
+    [SerializeField]
+    private ComputeShader generateOnMeshCS;
     
     public override void Create()
     {
         if (Terrain.activeTerrain != null)
         {
-            m_ScriptablePass = new CustomRenderPass(foliageDataList, placementCS, generateCS, Terrain.activeTerrain);
+            m_ScriptablePass = new CustomRenderPass(foliageDataList, placementCS, generateCS, generateOnMeshCS,
+                Terrain.activeTerrain, Resources.FindObjectsOfTypeAll<PlacableObject>());
             m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
         }
     }
