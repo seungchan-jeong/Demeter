@@ -5,105 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3a42c538-3db6-4d22-b6fd-d295f85b3fdc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Cube BrushCollection.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Cube BrushCollection.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Sphere BrushCollection.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Sphere BrushCollection.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Demo.unity" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Demo.unity.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/GameObject Brush v3.3.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/GameObject Brush v3.3.pdf.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Blue.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Blue.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Default.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Default.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Green.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Green.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Red.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Red.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Yellow.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Materials/Yellow.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Blue.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Blue.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Green.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Green.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Red.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Red.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Yellow.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Cube Yellow.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Multi Object Prefab.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Multi Object Prefab.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Blue.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Blue.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Green.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Green.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Red.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Red.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Yellow.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Prefabs/Sphere Yellow.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/AddObjectPopup.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/AddObjectPopup.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushCollection.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushCollection.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushObject.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/BrushObject.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/GameObjectBrushEditor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/GameObjectBrushEditor.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/StringPopupDialog.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Scripts/Editor/StringPopupDialog.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Grass01DensityMap.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Grass01DensityMap.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree01DensityMap.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree01DensityMap.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree02DensityMap.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree02DensityMap.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree03DensityMap.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/Tree03DensityMap.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/BrushToolTest.unity" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/BrushToolTest.unity.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderPreviewUnderCursor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderPreviewUnderCursor.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderWithTerrainUIGroup.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderWithTerrainUIGroup.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/PlacementBrushUIGroup.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DensityMapTool/PlacementBrushUIGroup.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/DensityMapTool.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/DensityMapTool.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ReadPixelTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/ReadPixelTest.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Shader.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Shader/Brush.shader" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Shader/Brush.shader.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/IndirectDrawMaterial.shader" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/IndirectDrawMaterial.shader" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/IndirectDrawMaterial.shader.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/IndirectDrawMaterial.shader.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/New Terrain.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/New Terrain.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/NewLayer.terrainlayer" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/NewLayer.terrainlayer.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/OpaqueUI.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/OpaqueUI.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.shader" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/OpaqueUI.shader" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/OpaqueUI.shader.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shader/OpaqueUI.shader.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/DensityMaps/SampleDensity01.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/DensityMaps/SampleDensity01.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Prototype.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Prototype.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateCS.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateCS.compute" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/FoliageData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/FoliageData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Grass01.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Grass01.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree01.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree01.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree02.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree02.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree03.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FoliageData/Tree03.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Demeter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Demeter/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/GameObjectBrush/Brushes/Default Brush Collection.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/BrushMaterial.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity-Renderer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity-Renderer.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,6 +37,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/27/45d3272c/RenderTextureReadWrite.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/57/800781c8/Vector2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/59/3182c73a/Graphics.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/60/387186d4/Transform.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/70/e4cb53d5/AsyncGPUReadbackRequest.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/78/7895b6d2/ComputeBuffer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24d45e813e524a99bfb7a145158a7980157a00/79/6cd3f072/Texture.cs" root0="SKIP_HIGHLIGHTING" />
@@ -167,6 +75,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/DiscretizeCS.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/DrawCircleCS.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateCS.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/GenerateOnMeshCS.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/IndirectDrawCS.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ComputeShaders/PlacementCS.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DensityMapTool/DensityMapToolBrushRenderPreviewUnderCursor.cs" root0="FORCE_HIGHLIGHTING" />
@@ -174,9 +83,10 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Discretize.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Editor/DensityMapTool.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FoliageData/FoliageData.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/PlacementRendererFeature.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/PlacableObject.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/PoissonDiskSampler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ReadPixelTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/RendererFeature/PlacementOnMeshRendererFeature.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ShaderFunction/IndirectPos.hlsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ShowHeightmap.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.core@12.1.7/Editor/Debugging/DebugWindow.cs" root0="SKIP_HIGHLIGHTING" />
@@ -284,6 +194,8 @@
       <workItem from="1668738193012" duration="1263000" />
       <workItem from="1668790303239" duration="127000" />
       <workItem from="1669779139664" duration="3997000" />
+      <workItem from="1671377355535" duration="132000" />
+      <workItem from="1671377511486" duration="15328000" />
     </task>
     <servers />
   </component>

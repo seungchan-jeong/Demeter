@@ -1,0 +1,229 @@
+#pragma kernel CSMain
+
+int meshTrisCount;
+// int meshTris[];
+// float2 meshUVs[];
+// float3 meshVerts[];
+StructuredBuffer<int> meshTris;
+StructuredBuffer<float2> meshUVs;
+StructuredBuffer<float3> meshVerts;
+float4x4 meshLocalToWorldMat;
+
+Texture2D<float4> DensityMap01;
+Texture2D<float4> DensityMap02;
+Texture2D<float4> DensityMap03;
+Texture2D<float4> DensityMap04;
+struct FoliageData
+{
+    int DensityMapResolution;
+    float3 FoliageScale;
+    float3 ZitterScale;
+    float pad;
+};
+StructuredBuffer<FoliageData> foliageData;
+int FoliageDataCount;
+
+struct SamplePoint
+{
+    float2 bayerMatrixUV;
+    float2 densityMapUV;
+    float2 heightMapUV;
+    float threshold;
+    float pad;
+};
+StructuredBuffer<SamplePoint> samplePoints; 
+struct FoliagePoint
+{
+    float4x4 TRSMat;
+    float3 worldNormal;
+    int foliageType;
+};
+AppendStructuredBuffer<FoliagePoint> foliagePoints01;
+AppendStructuredBuffer<FoliagePoint> foliagePoints02;
+AppendStructuredBuffer<FoliagePoint> foliagePoints03;
+AppendStructuredBuffer<FoliagePoint> foliagePoints04;
+
+uint Hash(uint s)
+{
+    s ^= 2747636419u;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    return s;
+}
+
+float Random(uint seed)
+{
+    return float(Hash(seed)) / 4294967295.0; // 2^32-1
+}
+
+float4x4 m_translate(float4x4 m, float3 v)
+{
+    float x = v.x, y = v.y, z = v.z;
+    m[0][3] = x;
+    m[1][3] = y;
+    m[2][3] = z;
+    return m;
+}
+
+float4x4 quaternion_to_matrix(float4 quat)
+{
+    float4x4 m = float4x4(float4(0, 0, 0, 0), float4(0, 0, 0, 0), float4(0, 0, 0, 0), float4(0, 0, 0, 0));
+
+    float x = quat.x, y = quat.y, z = quat.z, w = quat.w;
+    float x2 = x + x, y2 = y + y, z2 = z + z;
+    float xx = x * x2, xy = x * y2, xz = x * z2;
+    float yy = y * y2, yz = y * z2, zz = z * z2;
+    float wx = w * x2, wy = w * y2, wz = w * z2;
+
+    m[0][0] = 1.0 - (yy + zz);
+    m[0][1] = xy - wz;
+    m[0][2] = xz + wy;
+
+    m[1][0] = xy + wz;
+    m[1][1] = 1.0 - (xx + zz);
+    m[1][2] = yz - wx;
+
+    m[2][0] = xz - wy;
+    m[2][1] = yz + wx;
+    m[2][2] = 1.0 - (xx + yy);
+
+    m[3][3] = 1.0;
+
+    return m;
+}
+
+float4x4 m_scale(float4x4 m, float3 v)
+{
+    float x = v.x, y = v.y, z = v.z;
+
+    m[0][0] *= x; m[1][0] *= y; m[2][0] *= z;
+    m[0][1] *= x; m[1][1] *= y; m[2][1] *= z;
+    m[0][2] *= x; m[1][2] *= y; m[2][2] *= z;
+    m[0][3] *= x; m[1][3] *= y; m[2][3] *= z;
+
+    return m;
+}
+
+float4x4 trs(float3 position, float4 quat, float3 scale)
+{
+    float4x4 m = quaternion_to_matrix(quat);
+    m = m_scale(m, scale);
+    m = m_translate(m, position);
+    return m;
+}
+
+float Area(float2 p1, float2 p2, float2 p3)
+{
+    float2 v1 = p1 - p3;
+    float2 v2 = p2 - p3;
+    return (v1.x * v2.y - v1.y * v2.x) / 2;
+}
+//https://answers.unity.com/questions/372047/find-world-position-of-a-texture2d.html?childToView=372412#comment-372412
+float3 UvTo3D(float2 uv)
+{
+    for (int i = 0; i < meshTrisCount; i += 3)
+    {
+        float2 u1 = meshUVs[meshTris[i]];      
+        float2 u2 = meshUVs[meshTris[i + 1]];
+        float2 u3 = meshUVs[meshTris[i + 2]];
+                      
+        // Calculate triangle area - if zero, skip it
+        float a = Area(u1, u2, u3); 
+        if (a == 0) 
+            continue;
+        
+        // Calculate barycentric coordinates of u1, u2 and u3
+        // If anyone is negative, point is outside the triangle: skip it
+        
+        float a1 = Area(u2, u3, uv)/a; 
+        if (a1 < 0) 
+            continue;
+                 
+        float a2 = Area(u3, u1, uv)/a; 
+        if (a2 < 0) 
+            continue;
+                 
+        float a3 = Area(u1, u2, uv)/a; 
+        if (a3 < 0) 
+            continue;
+        
+        // Point inside the triangle - find mesh position by interpolation...
+        float3 p3D = a1* meshVerts[meshTris[i]] + a2 * meshVerts[meshTris[i + 1]] + a3 * meshVerts[meshTris[i + 2]];
+        
+        // return it in world coordinates:
+        return mul(meshLocalToWorldMat, float4(p3D.x, p3D.y, p3D.z, 1.0f)).xyz;
+    }
+ 
+    // Point outside any uv triangle
+    return (float3)0;
+}
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
+{
+    Texture2D DensityMapArray[] = {DensityMap01, DensityMap02, DensityMap03, DensityMap04}; //오..!
+    int targetIndex = groupIndex + groupID.x * 64;
+    SamplePoint samplePoint = samplePoints[targetIndex];
+
+    float densitySum = 0.0f;
+    for(int i = 0 ; i < FoliageDataCount; i++)
+    {
+        densitySum += DensityMapArray[i][uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][0];
+    }
+    
+    if(densitySum > samplePoint.threshold)
+    {
+        FoliagePoint foliagePoint = (FoliagePoint)0;
+        
+        //0. 확률 분포에 따라 생성 될 FoliageData 선택.
+        int choosenFoliageIndex = 0;
+        float randRange = 1.0f;
+        float randFloat = Random(id.x);
+
+        for(int i = 0 ; i < FoliageDataCount; i++)
+        {
+            float normalizedDensity = DensityMapArray[i][uint2(samplePoint.densityMapUV * foliageData[i].DensityMapResolution)][0] / densitySum;
+            if(randRange - normalizedDensity <= randFloat && randFloat < randRange)
+            {
+                choosenFoliageIndex = i;
+                break;
+            }
+            randRange -= normalizedDensity;
+        }
+        foliagePoint.foliageType = choosenFoliageIndex;
+        float3 scaleZitter = foliageData[choosenFoliageIndex].ZitterScale * float3(Random(id.x), Random(id.y), Random(id.z));
+        
+        //1. samplePoint에서의 worldPosition 계산
+        float3 worldPosition = UvTo3D(samplePoint.heightMapUV); //To Do
+        foliagePoint.TRSMat = trs(worldPosition, float4(0.0f, 0.0f, 0.0f, 1.0f), foliageData[choosenFoliageIndex].FoliageScale + scaleZitter);
+        
+        //2. samplePoint에서의 worldNormal 계산
+        //
+
+        //3. out Append
+        // AppendStructuredBuffer<FoliagePoint> foliagePointArray[] = {foliagePoints01, foliagePoints02, foliagePoints03, foliagePoints04};
+        // foliagePointArray[choosenFoliageIndex].Append(foliagePoint);
+        
+        if(choosenFoliageIndex == 0)
+        {
+            foliagePoints01.Append(foliagePoint);
+        }
+        else if(choosenFoliageIndex == 1)
+        {
+            foliagePoints02.Append(foliagePoint);
+        }
+        else if(choosenFoliageIndex == 2)
+        {
+            foliagePoints03.Append(foliagePoint);
+        }
+        else
+        {
+            foliagePoints04.Append(foliagePoint);
+        }
+    }
+}
+
+
