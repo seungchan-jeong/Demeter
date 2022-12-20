@@ -13,7 +13,8 @@ using Object = UnityEngine.Object;
 
 public class DensityMapTool : EditorWindow
 {
-    [FormerlySerializedAs("settingsArr")] [SerializeField]
+    [FormerlySerializedAs("settingsArr")] 
+    [SerializeField]
     private List<FoliageData> foliageDataList;
     private Editor[] editorArr;
     private Editor brushTextureEditor;
@@ -30,7 +31,9 @@ public class DensityMapTool : EditorWindow
     }
 
     private Terrain mainTerrain;
-    private Texture2D targetTexture2D;
+
+    private int targetTexture2DIndex;
+    // private Texture2D targetTexture2D;
     private RenderTexture renderTexture;
     private Material brushMateral;
 
@@ -93,14 +96,14 @@ public class DensityMapTool : EditorWindow
                         buttonSelections[j] = false;
                     }
                     buttonSelections[i] = true;
-                    targetTexture2D = foliageDataList[i].DensityMap;
+                    targetTexture2DIndex = i;
                 }
 
                 if (GUILayout.Button("Clear"))
                 {
                     RenderTexture.active = renderTexture;
 
-                    Texture2D clearTarget = foliageDataList[i].DensityMap;
+                    Texture2D clearTarget = foliageDataList[i].TerrainDensityMap;
                     LocalKeyword clearKeyword = new LocalKeyword(brushMateral.shader, "CLEAR");
                     brushMateral.SetKeyword(clearKeyword, true);
                     Graphics.Blit(clearTarget, renderTexture, brushMateral); 
@@ -122,7 +125,6 @@ public class DensityMapTool : EditorWindow
         }
     }
     
-    
     private void OnEnable()
     {
         foliageDataList = FindAssetsByType<FoliageData>();
@@ -136,9 +138,10 @@ public class DensityMapTool : EditorWindow
         
         mainTerrain = Terrain.activeTerrain;
 
-        targetTexture2D = foliageDataList[0].DensityMap;
-
-        renderTexture = new RenderTexture(targetTexture2D.width, targetTexture2D.height, 0,  targetTexture2D.graphicsFormat);
+        // targetTexture2D = foliageDataList[0].TerrainDensityMap;
+        targetTexture2DIndex = 0;
+        
+        renderTexture = new RenderTexture(foliageDataList[0].TerrainDensityMap.width, foliageDataList[0].TerrainDensityMap.height, 0,  foliageDataList[0].TerrainDensityMap.graphicsFormat);
         renderTexture.depthStencilFormat = GraphicsFormat.None;
         renderTexture.Create();
     }
@@ -158,48 +161,68 @@ public class DensityMapTool : EditorWindow
         
         Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) {
-            // Color color = Color.cyan;
-            // color.a = 0.25f;
-            // Handles.color = color;
-            // Handles.DrawSolidArc(hit.point, hit.normal, Vector3.Cross(hit.normal, ray.direction), 360, (float)brushTex.width / targetTexture2D.width * mainTerrain.terrainData.size.x * 0.25f * brushScale);
-            // // Debug.Log("DrawArc");
-            // Handles.color = Color.white;
-            // Handles.DrawLine(hit.point, hit.point + hit.normal * 5);
-
-            using (IBrushRenderPreviewUnderCursor brushRender =
-                   new DensityMapToolBrushRenderPreviewUIGroupUnderCursor(commonUI, "PaintDensity", brushTex))
+        if (Physics.Raycast(ray, out hit))
+        {
+            Texture2D targetTexture2D;
+            if (hit.transform.gameObject.GetComponent<Terrain>() != null)
             {
-                if (brushRender.CalculateBrushTransform(out BrushTransform brushXform))
-                {
-                    PaintContext paintContext = brushRender.AcquireHeightmap(false, brushXform.GetBrushXYBounds(), 1);
-                    Material previewMaterial = Utility.GetDefaultPreviewMaterial(false);
-                    TerrainPaintUtilityEditor.DrawBrushPreview(paintContext, TerrainBrushPreviewMode.SourceRenderTexture,
-                        brushTex, brushXform, previewMaterial, 0);
-                }
+                targetTexture2D = foliageDataList[targetTexture2DIndex].TerrainDensityMap;
             }
+            else if(hit.transform.gameObject.GetComponent<PlacableObject>() != null)
+            {
+                PlacableObject placableObject = hit.transform.gameObject.GetComponent<PlacableObject>();
+                targetTexture2D = placableObject.densityMapForFoliageData[foliageDataList[targetTexture2DIndex]];
+            }
+            else
+            {
+                return;
+            }
+            
+            Color color = hit.transform.gameObject.GetComponent<Terrain>() != null ? Color.cyan : Color.yellow;
+            color.a = 0.25f;
+            Handles.color = color;
+            Handles.DrawSolidArc(hit.point, hit.normal, Vector3.Cross(hit.normal, ray.direction), 360, (float)brushTex.width / targetTexture2D.width * mainTerrain.terrainData.size.x * 0.25f * brushScale);
+            Handles.color = Color.white;
+            Handles.DrawLine(hit.point, hit.point + hit.normal * 5);
+
+            // using (IBrushRenderPreviewUnderCursor brushRender =
+            //        new DensityMapToolBrushRenderPreviewUIGroupUnderCursor(commonUI, "PaintDensity", brushTex))
+            // {
+            //     if (brushRender.CalculateBrushTransform(out BrushTransform brushXform))
+            //     {
+            //         PaintContext paintContext = brushRender.AcquireHeightmap(false, brushXform.GetBrushXYBounds(), 1);
+            //         Material previewMaterial = Utility.GetDefaultPreviewMaterial(false);
+            //         TerrainPaintUtilityEditor.DrawBrushPreview(paintContext, TerrainBrushPreviewMode.SourceRenderTexture,
+            //             brushTex, brushXform, previewMaterial, 0);
+            //     }
+            // }
 
             bool bShouldUpdateTexture = Event.current.rawType is EventType.MouseDown or EventType.MouseDrag && Event.current.button == 0;
             
             if (bShouldUpdateTexture)
             {
-                Vector2 brushPos = WorldPosToTerrainPos(hit.point);
-                // Debug.Log(brushPos);
-                
                 RenderTexture.active = renderTexture;
-                // Graphics.CopyTexture(targetTexture2D, renderTexture);
-                // Graphics.Blit(targetTexture2D, renderTexture);
+                
+                if (hit.transform.gameObject.GetComponent<Terrain>() != null)
+                {
+                    Vector2 brushPos = WorldPosToTerrainPos(hit.point);
+                    brushMateral.SetVector("_BrushPos",  new Vector4(brushPos.x, brushPos.y, 0.0f, 0.0f));
+                }
+                else
+                {
+                    brushMateral.SetVector("_BrushPos", hit.textureCoord);
+                }
+
                 brushMateral.SetTexture("_TestTex", targetTexture2D);
                 brushMateral.SetFloat("_BrushScale", brushScale);
-                brushMateral.SetVector("_BrushPos", new Vector4(brushPos.x, brushPos.y, 0.0f, 0.0f));
                 brushMateral.SetVector("_BrushTint", Event.current.alt? Color.black : Color.white);
                 brushMateral.SetVector("_Brush_TexelSize", new Vector4(brushTex.width, brushTex.height, 0.0f, 0.0f));
                 brushMateral.SetVector("_TestTex_TexelSize", new Vector4(targetTexture2D.width, targetTexture2D.height, 0.0f, 0.0f));
-                Graphics.Blit(targetTexture2D, renderTexture, brushMateral); //? Run 도중에만 정상작동함.
+                Graphics.Blit(targetTexture2D, renderTexture, brushMateral);
                 
                 targetTexture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
                 targetTexture2D.Apply();
-                
+
                 Event.current.Use();
             }
             else

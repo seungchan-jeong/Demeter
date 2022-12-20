@@ -110,7 +110,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BrushPos: {r: 0.12354981, g: 0.7630317, b: 0, a: 0}
+    - _BrushPos: {r: 0.53629565, g: 0.87127334, b: 0, a: 0}
     - _BrushTint: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

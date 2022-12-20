@@ -13,6 +13,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
         
         private List<FoliageData> foliageDataList;
         private Dictionary<int, List<FoliageData>> foliageDataByFootprint;
+        private Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint;
         private Terrain mainTerrain;
 
         private Dictionary<int, ComputeBuffer> samplePointBufferDict;
@@ -127,7 +128,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                     FoliageData item = currentList[i];
                     FoliageComputeBufferData fcbd = new FoliageComputeBufferData()
                     {
-                        densityMapResolution = item.DensityMap.width,
+                        densityMapResolution = item.TerrainDensityMap.width,
                         foliageScale = item.FoliageScale,
                         zitterScale = item.FoliageScale * 0.1f,
                         pad = 0.0f
@@ -140,8 +141,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 foliageComputeBufferDataDict.Add(foliageDataByFootprint.Key, foliageDataComputeBuffer);
             }
         }
-
-        private Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint;
+        
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             int generateCSMain = generateCS.FindKernel("CSMain");
@@ -185,7 +185,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 InitPerMeshParameters(cmd, generateOnMeshCS, placeTargetObject);
                 foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
                 {
-                    RunPipelines(generateOnMeshCS, cmd, context, foliageDataAndFootprint.Key, pointCloudBufferByFootprint);
+                    RunPipelines(generateOnMeshCS, cmd, context, foliageDataAndFootprint.Key, pointCloudBufferByFootprint, placeTargetObject);
                 }
             }
 
@@ -193,6 +193,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             {
                 DrawIndirect(cmd, context, foliageDataAndFootprint.Value, pointCloudBufferByFootprint);
             }
+            
             
             cmd.EndSample("PlacementRenderer");
 
@@ -247,7 +248,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             cmd.SetComputeMatrixParam(targetShader, "meshLocalToWorldMat", placeTargetObject.transform.localToWorldMatrix);
         }
 
-        private void RunPipelines(ComputeShader targetShader, CommandBuffer cmd, ScriptableRenderContext context, int footprint, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint)
+        private void RunPipelines(ComputeShader targetShader, CommandBuffer cmd, ScriptableRenderContext context, int footprint, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint, PlacableObject placableObject = null)
         {
             int generateCSMain = targetShader.FindKernel("CSMain");
             
@@ -260,7 +261,14 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             {
                 if (i < foliageDataByFootprint[footprint].Count)
                 {
-                    cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(foliageDataByFootprint[footprint][i].DensityMap));
+                    if (placableObject == null)
+                    {
+                        cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(foliageDataByFootprint[footprint][i].TerrainDensityMap));
+                    }
+                    else if(placableObject.densityMapForFoliageData != null)
+                    {
+                        cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(placableObject.densityMapForFoliageData[foliageDataByFootprint[footprint][i]]));
+                    }
                 }
                 else
                 {

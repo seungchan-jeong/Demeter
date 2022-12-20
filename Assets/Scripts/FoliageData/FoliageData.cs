@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "Foliage Data", menuName = "Scriptable Object/Foliage Data", order = int.MaxValue)]
 public class FoliageData : ScriptableObject
@@ -11,8 +12,10 @@ public class FoliageData : ScriptableObject
     private Vector3 foliageScale;
     [SerializeField]
     private float footprint;
-    [SerializeField]
-    private Texture2D densityMap;
+    [FormerlySerializedAs("densityMap")] [SerializeField]
+    private Texture2D terrainDensityMap;
+
+    private Dictionary<GameObject, Texture2D> gameObjectDensityMapDict;
     public Mesh FoliageMesh
     {
         get
@@ -47,11 +50,11 @@ public class FoliageData : ScriptableObject
         get { return foliageScale; }
     }
 
-    public Texture2D DensityMap
+    public Texture2D TerrainDensityMap
     {
         get
         {
-            return densityMap;
+            return terrainDensityMap;
         }
     }
 
