@@ -345,7 +345,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             {
                 ComputeBuffer temp = new ComputeBuffer(1, 4);
                 cmd.SetComputeBufferParam(cs, csMainHandle, "foliagePoints0" + (i+1), temp);
-                temp.Dispose(); //To Do. 이거 temp로 하지 않고 무조건 할당해주는게 나으려나..?
+                temp.Dispose(); //TODO : 이거 temp로 하지 않고 무조건 할당해주는게 나으려나..?
             }
             
             //5. Dispatch 
@@ -370,7 +370,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
         private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint)
         {
-            for(int i = 0 ; i < foliageData.Count; i++) //todo foliageData.Count 와 pointCloudBuffer.Count는 항상 같다. 이걸 보장할 방법 찾기. 
+            for(int i = 0 ; i < foliageData.Count; i++) //TODO : foliageData.Count 와 pointCloudBuffer.Count는 항상 같다. 이걸 보장할 방법 찾기. 
             {
                 FoliageData item = foliageData[i];
                 Material[] foliageMaterials = item.FoliageMaterials;
@@ -385,7 +385,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                         
                         argBufferList[subMeshIndex].SetData(args);
                         cmd.CopyCounterValue(pointCloudBufferByFootprint[(int)item.Footprint][i], argBufferList[subMeshIndex], sizeof(uint));
-                        /* pointCloudBufferByFootprint의 ComputeBuffer는, 어떤 footprint에 대한 FoliageData를 무작위로 가지고 있을 수 있음. foliageData List의 index와 ComputeBuffer의 index가 서로 맞지 않을 수 있음. */
+                        //TODO : pointCloudBufferByFootprint의 ComputeBuffer는, 어떤 footprint에 대한 FoliageData를 무작위로 가지고 있을 수 있음. foliageData List의 index와 ComputeBuffer의 index가 서로 맞지 않을 수 있음
 
                         foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferByFootprint[(int)item.Footprint][i]);
                         cmd.DrawMeshInstancedIndirect(item.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex],
