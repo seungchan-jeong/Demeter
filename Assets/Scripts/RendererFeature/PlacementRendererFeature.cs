@@ -9,72 +9,119 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 {
     class CustomRenderPass : ScriptableRenderPass
     {
-        private List<PlacableObject> placeTargetObjects;
+        private Terrain _mainTerrain;
+        private List<PlacableObject> _placeTargetObjects;
         
-        private List<FoliageData> foliageDataList;
-        private Dictionary<int, List<FoliageData>> foliageDataByFootprint;
-        private Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint;
-        private Terrain mainTerrain;
-
-        private Dictionary<int, ComputeBuffer> samplePointBufferDict;
-        private Dictionary<int, ComputeBuffer> foliageComputeBufferDataDict;
-        private Dictionary<FoliageData, List<ComputeBuffer>> indirectArgBufferDict;
-        private Dictionary<Mesh, MeshDataComputeBuffer> meshDataBufferDict;
-        private List<ComputeBuffer> pointCloudBufferList;
+        private List<FoliageData> _foliageDataList;
+        private Dictionary<int, List<FoliageData>> _foliageDataByFootprint;
+        
+        private List<ComputeBuffer> _pointCloudBuffers;
+        private Dictionary<int, List<ComputeBuffer>> _pointCloudBufferByFootprint;
+        
+        private Dictionary<int, ComputeBuffer> _samplePointBufferByFootprint;
+        private Dictionary<int, ComputeBuffer> _foliageBufferByFootprint;
+        private Dictionary<FoliageData, List<ComputeBuffer>> _indirectArgBufferByFoliageData;
+        private Dictionary<Mesh, MeshDataComputeBuffer> _meshDataBufferByMesh;
         private const int POINT_CLOUD_BUFFER_NUM_MAX = 4;
         
         private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
-        private int instanceCountSqrt = 100;
 
         private ComputeShader generateCS;
         private ComputeShader generateOnMeshCS;
         private ComputeShader placementCS;
 
-        private PoissonDiskSampler poissonDiskSampler;
+        private PoissonDiskSampler _poissonDiskSampler;
 
-        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, ComputeShader generateOnMeshCS, Terrain mainTerrain, params PlacableObject[] debugPlacableObject)
+        public CustomRenderPass(List<FoliageData> foliageDataList, ComputeShader placementCS, ComputeShader generateCS, ComputeShader generateOnMeshCS, Terrain mainTerrain, params PlacableObject[] placableObjects)
         {
-            this.foliageDataList = foliageDataList;
             this.placementCS = placementCS;
             this.generateCS = generateCS;
             this.generateOnMeshCS = generateOnMeshCS;
-            this.mainTerrain = mainTerrain;
+            
+            this._foliageDataList = foliageDataList;
+            this._mainTerrain = mainTerrain;
 
-            poissonDiskSampler = new PoissonDiskSampler();
-            pointCloudBufferList = new List<ComputeBuffer>();
-            foliageDataByFootprint = new Dictionary<int, List<FoliageData>>();
-            samplePointBufferDict = new Dictionary<int, ComputeBuffer>();
-            foliageComputeBufferDataDict = new Dictionary<int, ComputeBuffer>();
-            indirectArgBufferDict = new Dictionary<FoliageData, List<ComputeBuffer>>();
-            meshDataBufferDict = new Dictionary<Mesh, MeshDataComputeBuffer>();
+            _poissonDiskSampler = new PoissonDiskSampler();
+            
+            _pointCloudBuffers = new List<ComputeBuffer>();
+            _pointCloudBufferByFootprint = new Dictionary<int, List<ComputeBuffer>>();
+            _samplePointBufferByFootprint = new Dictionary<int, ComputeBuffer>();
+            _foliageDataByFootprint = new Dictionary<int, List<FoliageData>>();
+            _foliageBufferByFootprint = new Dictionary<int, ComputeBuffer>();
+            _indirectArgBufferByFoliageData = new Dictionary<FoliageData, List<ComputeBuffer>>();
+            _meshDataBufferByMesh = new Dictionary<Mesh, MeshDataComputeBuffer>();
 
-            placeTargetObjects = new List<PlacableObject>();
-            placeTargetObjects.AddRange(debugPlacableObject);
+            _placeTargetObjects = new List<PlacableObject>();
+            _placeTargetObjects.AddRange(placableObjects);
         }
 
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            int generateCSMain = generateCS.FindKernel("CSMain");
+            
+            cmd.SetComputeFloatParam(generateCS, "TerrainWidth", _mainTerrain.terrainData.size.x);
+            cmd.SetComputeFloatParam(generateCS, "TerrainHeight", _mainTerrain.terrainData.heightmapScale.y);
+            cmd.SetComputeFloatParam(generateCS, "TerrainLength", _mainTerrain.terrainData.size.z);
+            
+            cmd.SetComputeTextureParam(generateCS, generateCSMain, "TerrainHeightMap",
+                new RenderTargetIdentifier(_mainTerrain.terrainData.heightmapTexture));
+            cmd.SetComputeIntParam(generateCS, "TerrainHeightMapResolution",
+                _mainTerrain.terrainData.heightmapResolution);
+
+            if (_foliageDataByFootprint.Count == 0)
+            {
+                InitFoliageDictionary();
+            }
+
+            if (_samplePointBufferByFootprint.Count == 0)
+            {
+                InitSamplePointBuffer();
+            }
+
+            if (_foliageBufferByFootprint.Count == 0)
+            {
+                InitFoliageDataBuffer();
+            }
+
+            if (_indirectArgBufferByFoliageData.Count == 0)
+            {
+                InitIndirectArgBuffer();
+            }
+
+            if (_meshDataBufferByMesh.Count == 0)
+            {
+                InitMeshDataBuffer();
+            }
+            
+            if (_pointCloudBufferByFootprint.Count == 0)
+            {
+                InitPointCloudBufferByFootprint(cmd, _foliageDataByFootprint);
+            }
+        }
+        
         private void InitFoliageDictionary()
         {
-            foreach (FoliageData foliageData in foliageDataList)
+            foreach (FoliageData foliageData in _foliageDataList)
             {
                 int footprint = (int)foliageData.Footprint;
-                if (!foliageDataByFootprint.ContainsKey(footprint))
+                if (!_foliageDataByFootprint.ContainsKey(footprint))
                 {
-                    foliageDataByFootprint.Add(footprint, new List<FoliageData>() { foliageData });
+                    _foliageDataByFootprint.Add(footprint, new List<FoliageData>() { foliageData });
                 }
                 else
                 {
-                    foliageDataByFootprint[footprint].Add(foliageData);
+                    _foliageDataByFootprint[footprint].Add(foliageData);
                 }
             }
         }
         
         private void InitSamplePointBuffer()
         {
-            foreach (FoliageData foliageData in foliageDataList)
+            foreach (FoliageData foliageData in _foliageDataList)
             {
                 float foliageDataFootprint = foliageData.Footprint;
 
-                if (samplePointBufferDict.ContainsKey((int)foliageDataFootprint))
+                if (_samplePointBufferByFootprint.ContainsKey((int)foliageDataFootprint))
                 {
                     continue;
                 }
@@ -83,15 +130,15 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 List<Vector2> poissonUVs = null;
                 if (Math.Abs(foliageDataFootprint - 1.0f) < Mathf.Epsilon)
                 {
-                    poissonUVs = poissonDiskSampler.Get10000Points();
+                    poissonUVs = _poissonDiskSampler.Get10000Points();
                 }
                 else if (Math.Abs(foliageDataFootprint - 2.0f) < Mathf.Epsilon)
                 {
-                    poissonUVs = poissonDiskSampler.Get2500Points();
+                    poissonUVs = _poissonDiskSampler.Get2500Points();
                 }
                 else if (Math.Abs(foliageDataFootprint - 4.0f) < Mathf.Epsilon)
                 {
-                    poissonUVs = poissonDiskSampler.Get500Points();
+                    poissonUVs = _poissonDiskSampler.Get500Points();
                 }
 
                 if (poissonUVs == null)
@@ -113,13 +160,13 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 
                 ComputeBuffer samplePointBuffer = new ComputeBuffer(samplePoints.Count, sizeof(float) * 8); 
                 samplePointBuffer.SetData(samplePoints);
-                samplePointBufferDict.Add((int)foliageDataFootprint, samplePointBuffer);
+                _samplePointBufferByFootprint.Add((int)foliageDataFootprint, samplePointBuffer);
             }
         }
 
         private void InitFoliageDataBuffer()
         {
-            foreach(var foliageDataByFootprint in foliageDataByFootprint)
+            foreach(var foliageDataByFootprint in _foliageDataByFootprint)
             {
                 List<FoliageData> currentList = foliageDataByFootprint.Value;
                 List<FoliageComputeBufferData> foliageComputeBufferDataList = new List<FoliageComputeBufferData>();
@@ -138,13 +185,13 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 
                 ComputeBuffer foliageDataComputeBuffer = new ComputeBuffer(currentList.Count, sizeof(int) * 1 + sizeof(float) * 7);
                 foliageDataComputeBuffer.SetData(foliageComputeBufferDataList);
-                foliageComputeBufferDataDict.Add(foliageDataByFootprint.Key, foliageDataComputeBuffer);
+                _foliageBufferByFootprint.Add(foliageDataByFootprint.Key, foliageDataComputeBuffer);
             }
         }
 
         private void InitIndirectArgBuffer()
         {
-            foreach (FoliageData foliageData in foliageDataList)
+            foreach (FoliageData foliageData in _foliageDataList)
             {
                 List<ComputeBuffer> argBufferList = new List<ComputeBuffer>();
                 for (int i = 0; i < foliageData.FoliageMesh.subMeshCount; i++)
@@ -152,13 +199,13 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                     argBufferList.Add(new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments));
                 }
                 
-                indirectArgBufferDict.Add(foliageData, argBufferList);
+                _indirectArgBufferByFoliageData.Add(foliageData, argBufferList);
             }
         }
 
         private void InitMeshDataBuffer()
         {
-            foreach (PlacableObject placableObject in placeTargetObjects)
+            foreach (PlacableObject placableObject in _placeTargetObjects)
             {
                 MeshFilter meshFilter = placableObject.GetComponent<MeshFilter>();
                 if (meshFilter == null)
@@ -177,97 +224,62 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 verts.SetData(sharedMesh.vertices);
 
                 MeshDataComputeBuffer meshComputeBuffers = new MeshDataComputeBuffer(tris, uvs, verts);
-                meshDataBufferDict.Add(sharedMesh, meshComputeBuffers);
+                _meshDataBufferByMesh.Add(sharedMesh, meshComputeBuffers);
             }
-        }
-
-        public void Dispose()
-        {
-            foreach(List<ComputeBuffer> bufferList in pointCloudBufferByFootprint.Values)
-            {
-                foreach (ComputeBuffer buffer in bufferList)
-                {
-                    buffer?.Dispose();
-                }
-            }
-            pointCloudBufferByFootprint.Clear();
-            
-            foreach(List<ComputeBuffer> bufferList in indirectArgBufferDict.Values)
-            {
-                foreach (ComputeBuffer buffer in bufferList)
-                {
-                    buffer?.Dispose();
-                }
-            }
-            indirectArgBufferDict.Clear();
-
-            foreach(MeshDataComputeBuffer buffer in meshDataBufferDict.Values)
-            {
-                buffer?.Dispose();
-            }
-            meshDataBufferDict.Clear();
-            
-            foreach (ComputeBuffer buffer in samplePointBufferDict.Values)
-            {
-                buffer?.Dispose();
-            }
-            samplePointBufferDict.Clear();
-            
-            foreach (ComputeBuffer buffer in foliageComputeBufferDataDict.Values)
-            {
-                buffer?.Dispose();
-            }
-            foliageComputeBufferDataDict.Clear();
-
-            
         }
         
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        private void InitPointCloudBufferByFootprint(CommandBuffer cmd, Dictionary<int, List<FoliageData>> inFoliageDataByFootprint)
         {
-            int generateCSMain = generateCS.FindKernel("CSMain");
-            
-            cmd.SetComputeFloatParam(generateCS, "TerrainWidth", mainTerrain.terrainData.size.x);
-            cmd.SetComputeFloatParam(generateCS, "TerrainHeight", mainTerrain.terrainData.heightmapScale.y);
-            cmd.SetComputeFloatParam(generateCS, "TerrainLength", mainTerrain.terrainData.size.z);
-            
-            cmd.SetComputeTextureParam(generateCS, generateCSMain, "TerrainHeightMap",
-                new RenderTargetIdentifier(mainTerrain.terrainData.heightmapTexture));
-            cmd.SetComputeIntParam(generateCS, "TerrainHeightMapResolution",
-                mainTerrain.terrainData.heightmapResolution);
-
-            if (foliageDataByFootprint.Count == 0)
+            foreach (KeyValuePair<int, List<FoliageData>> footprintAndFoliageData in inFoliageDataByFootprint)
             {
-                InitFoliageDictionary();
-            }
-
-            if (samplePointBufferDict.Count == 0)
-            {
-                InitSamplePointBuffer();
-            }
-
-            if (foliageComputeBufferDataDict.Count == 0)
-            {
-                InitFoliageDataBuffer();
-            }
-
-            if (indirectArgBufferDict.Count == 0)
-            {
-                InitIndirectArgBuffer();
-            }
-
-            if (meshDataBufferDict.Count == 0)
-            {
-                InitMeshDataBuffer();
-            }
-            
-            if (pointCloudBufferByFootprint == null)
-            {
-                pointCloudBufferByFootprint = InitPointCloudBufferByFootprint(cmd, foliageDataByFootprint);
+                List<ComputeBuffer> pointCloudBuffers = new List<ComputeBuffer>();
+                foreach (FoliageData foliageData in footprintAndFoliageData.Value)
+                {
+                    pointCloudBuffers.Add(new ComputeBuffer(_samplePointBufferByFootprint[footprintAndFoliageData.Key].count, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
+                }
+                _pointCloudBufferByFootprint.Add(footprintAndFoliageData.Key, pointCloudBuffers);
             }
         }
-        public override void OnCameraCleanup(CommandBuffer cmd)
+        
+        public void Dispose()
         {
+            foreach(List<ComputeBuffer> bufferList in _pointCloudBufferByFootprint.Values)
+            {
+                foreach (ComputeBuffer buffer in bufferList)
+                {
+                    buffer?.Dispose();
+                }
+            }
+            _pointCloudBufferByFootprint.Clear();
+            
+            foreach(List<ComputeBuffer> bufferList in _indirectArgBufferByFoliageData.Values)
+            {
+                foreach (ComputeBuffer buffer in bufferList)
+                {
+                    buffer?.Dispose();
+                }
+            }
+            _indirectArgBufferByFoliageData.Clear();
+
+            foreach(MeshDataComputeBuffer buffer in _meshDataBufferByMesh.Values)
+            {
+                buffer?.Dispose();
+            }
+            _meshDataBufferByMesh.Clear();
+            
+            foreach (ComputeBuffer buffer in _samplePointBufferByFootprint.Values)
+            {
+                buffer?.Dispose();
+            }
+            _samplePointBufferByFootprint.Clear();
+            
+            foreach (ComputeBuffer buffer in _foliageBufferByFootprint.Values)
+            {
+                buffer?.Dispose();
+            }
+            _foliageBufferByFootprint.Clear();
         }
+        
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
@@ -275,7 +287,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
 
             cmd.BeginSample("PlacementRenderer");
 
-            foreach (var temp in pointCloudBufferByFootprint)
+            foreach (var temp in _pointCloudBufferByFootprint)
             {
                 foreach (var cb in temp.Value)
                 {
@@ -283,23 +295,23 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 }
             }
             
-            foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
+            foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in _foliageDataByFootprint)
             {
-                RunPipelines(generateCS, cmd, context, foliageDataAndFootprint.Key, pointCloudBufferByFootprint);
+                RunPipelines(generateCS, cmd, context, foliageDataAndFootprint.Key, _pointCloudBufferByFootprint);
             }
 
-            foreach (PlacableObject placeTargetObject in placeTargetObjects)
+            foreach (PlacableObject placeTargetObject in _placeTargetObjects)
             {
-                InitPerMeshParameters(cmd, generateOnMeshCS, placeTargetObject);
-                foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
+                SetPerMeshParameters(cmd, generateOnMeshCS, placeTargetObject);
+                foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in _foliageDataByFootprint)
                 {
-                    RunPipelines(generateOnMeshCS, cmd, context, foliageDataAndFootprint.Key, pointCloudBufferByFootprint, placeTargetObject);
+                    RunPipelines(generateOnMeshCS, cmd, context, foliageDataAndFootprint.Key, _pointCloudBufferByFootprint, placeTargetObject);
                 }
             }
 
-            foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in foliageDataByFootprint)
+            foreach (KeyValuePair<int, List<FoliageData>> foliageDataAndFootprint in _foliageDataByFootprint)
             {
-                DrawIndirect(cmd, context, foliageDataAndFootprint.Value, pointCloudBufferByFootprint);
+                DrawIndirect(cmd, context, foliageDataAndFootprint.Value, _pointCloudBufferByFootprint);
             }
             
             
@@ -308,69 +320,27 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             context.ExecuteCommandBuffer(cmd);
             cmd.Release();
         }
-        
-        private void InitPointCloudBufferList(CommandBuffer cmd, int cloudBufferCount, int instanceCount)
-        {
-            pointCloudBufferList.Clear(); //todo 이거 꼭 new 해야해? 재사용 불가능? 
-            for (int i = 0; i < cloudBufferCount; i++)
-            {
-                pointCloudBufferList.Add(new ComputeBuffer(instanceCount, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
-                cmd.SetBufferCounterValue(pointCloudBufferList[i], 0);
-            }
-        }
-        
-        private Dictionary<int, List<ComputeBuffer>> InitPointCloudBufferByFootprint(CommandBuffer cmd, Dictionary<int, List<FoliageData>> inFoliageDataByFootprint)
-        {
-            Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint =
-                new Dictionary<int, List<ComputeBuffer>>();
-            foreach (KeyValuePair<int, List<FoliageData>> footprintAndFoliageData in inFoliageDataByFootprint)
-            {
-                List<ComputeBuffer> pointCloudBuffers = new List<ComputeBuffer>();
-                foreach (FoliageData foliageData in footprintAndFoliageData.Value)
-                {
-                    pointCloudBuffers.Add(new ComputeBuffer(samplePointBufferDict[footprintAndFoliageData.Key].count, sizeof(float) * 19 + sizeof(int), ComputeBufferType.Append));
-                }
-                pointCloudBufferByFootprint.Add(footprintAndFoliageData.Key, pointCloudBuffers);
-            }
-
-            return pointCloudBufferByFootprint;
-        }
-        
-        private void InitPerMeshParameters(CommandBuffer cmd, ComputeShader targetShader, PlacableObject placeTargetObject)
-        {
-            int csMain = targetShader.FindKernel("CSMain");
-            
-            Mesh objectMesh = placeTargetObject.GetComponent<MeshFilter>().sharedMesh;
-            if (meshDataBufferDict.TryGetValue(objectMesh, out MeshDataComputeBuffer buffer))
-            {
-                cmd.SetComputeIntParam(targetShader, "meshTrisCount", objectMesh.triangles.Length);
-                cmd.SetComputeBufferParam(targetShader, csMain, "meshTris", buffer.trisBuffer);
-                cmd.SetComputeBufferParam(targetShader, csMain, "meshUVs", buffer.uvsBuffer);
-                cmd.SetComputeBufferParam(targetShader, csMain, "meshVerts", buffer.vertsBuffer);
-                cmd.SetComputeMatrixParam(targetShader, "meshLocalToWorldMat", placeTargetObject.transform.localToWorldMatrix);
-            }
-        }
 
         private void RunPipelines(ComputeShader targetShader, CommandBuffer cmd, ScriptableRenderContext context, int footprint, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint, PlacableObject placableObject = null)
         {
             int generateCSMain = targetShader.FindKernel("CSMain");
             
             //1. Set Foliage Data Info
-            cmd.SetComputeIntParam(targetShader, "FoliageDataCount", foliageComputeBufferDataDict[footprint].count);
-            cmd.SetComputeBufferParam(targetShader, generateCSMain, "foliageData", foliageComputeBufferDataDict[footprint]);
+            cmd.SetComputeIntParam(targetShader, "FoliageDataCount", _foliageBufferByFootprint[footprint].count);
+            cmd.SetComputeBufferParam(targetShader, generateCSMain, "foliageData", _foliageBufferByFootprint[footprint]);
 
             //2. Set Density Maps
             for (int i = 0; i < POINT_CLOUD_BUFFER_NUM_MAX; i++)
             {
-                if (i < foliageDataByFootprint[footprint].Count)
+                if (i < _foliageDataByFootprint[footprint].Count)
                 {
                     if (placableObject == null)
                     {
-                        cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(foliageDataByFootprint[footprint][i].TerrainDensityMap));
+                        cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(_foliageDataByFootprint[footprint][i].TerrainDensityMap));
                     }
                     else if(placableObject.densityMapForFoliageData != null)
                     {
-                        cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(placableObject.densityMapForFoliageData[foliageDataByFootprint[footprint][i]]));
+                        cmd.SetComputeTextureParam(targetShader, generateCSMain, "DensityMap0" + (i+1), new RenderTargetIdentifier(placableObject.densityMapForFoliageData[_foliageDataByFootprint[footprint][i]]));
                     }
                 }
                 else
@@ -380,7 +350,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             }
 
             //3. Set Sample Points
-            cmd.SetComputeBufferParam(targetShader, generateCSMain, "samplePoints", samplePointBufferDict[footprint]);
+            cmd.SetComputeBufferParam(targetShader, generateCSMain, "samplePoints", _samplePointBufferByFootprint[footprint]);
             
             //4. Set Output Buffer
             for (int i = 0; i < pointCloudBufferByFootprint[footprint].Count; i++)
@@ -396,7 +366,22 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             
             //5. Dispatch 
             cmd.DispatchCompute(targetShader, generateCSMain,
-                Mathf.CeilToInt((float)samplePointBufferDict[footprint].count / 64), 1, 1);
+                Mathf.CeilToInt((float)_samplePointBufferByFootprint[footprint].count / 64), 1, 1);
+        }
+        
+        private void SetPerMeshParameters(CommandBuffer cmd, ComputeShader targetShader, PlacableObject placeTargetObject)
+        {
+            int csMain = targetShader.FindKernel("CSMain");
+            
+            Mesh objectMesh = placeTargetObject.GetComponent<MeshFilter>().sharedMesh;
+            if (_meshDataBufferByMesh.TryGetValue(objectMesh, out MeshDataComputeBuffer buffer))
+            {
+                cmd.SetComputeIntParam(targetShader, "meshTrisCount", objectMesh.triangles.Length);
+                cmd.SetComputeBufferParam(targetShader, csMain, "meshTris", buffer.trisBuffer);
+                cmd.SetComputeBufferParam(targetShader, csMain, "meshUVs", buffer.uvsBuffer);
+                cmd.SetComputeBufferParam(targetShader, csMain, "meshVerts", buffer.vertsBuffer);
+                cmd.SetComputeMatrixParam(targetShader, "meshLocalToWorldMat", placeTargetObject.transform.localToWorldMatrix);
+            }
         }
 
         private void DrawIndirect(CommandBuffer cmd, ScriptableRenderContext context, List<FoliageData> foliageData, Dictionary<int, List<ComputeBuffer>> pointCloudBufferByFootprint)
@@ -407,7 +392,7 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 Material[] foliageMaterials = item.FoliageMaterials;
                 for (int subMeshIndex = 0; subMeshIndex < item.FoliageMesh.subMeshCount; subMeshIndex++)
                 {
-                    if (indirectArgBufferDict.TryGetValue(item, out List<ComputeBuffer> argBufferList) && item.FoliageMesh != null)
+                    if (_indirectArgBufferByFoliageData.TryGetValue(item, out List<ComputeBuffer> argBufferList) && item.FoliageMesh != null)
                     {
                         args[0] = (uint)item.FoliageMesh.GetIndexCount(subMeshIndex);
                         // args[1] => Compute Buffer decides
