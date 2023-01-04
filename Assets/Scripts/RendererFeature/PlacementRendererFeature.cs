@@ -185,7 +185,17 @@ public class PlacementRendererFeature : ScriptableRendererFeature
             {
                 List<ComputeBuffer> argBufferList = Enumerable.Range(0, foliageData.FoliageMesh.subMeshCount).
                     Select(_ => new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments)).ToList();
-                
+
+                for (int subMeshIndex = 0; subMeshIndex < foliageData.FoliageMesh.subMeshCount; subMeshIndex++)
+                {
+                    args[0] = (uint)foliageData.FoliageMesh.GetIndexCount(subMeshIndex);
+                    // args[1] => Append Compute Buffer decides
+                    args[2] = (uint)foliageData.FoliageMesh.GetIndexStart(subMeshIndex);
+                    args[3] = (uint)foliageData.FoliageMesh.GetBaseVertex(subMeshIndex);
+                    
+                    argBufferList[subMeshIndex].SetData(args);
+                }
+
                 _indirectArgBufferByFoliageData.Add(foliageData, argBufferList);
             }
         }
@@ -378,15 +388,9 @@ public class PlacementRendererFeature : ScriptableRendererFeature
                 {
                     if (_indirectArgBufferByFoliageData.TryGetValue(item, out List<ComputeBuffer> argBufferList) && item.FoliageMesh != null)
                     {
-                        args[0] = (uint)item.FoliageMesh.GetIndexCount(subMeshIndex);
-                        // args[1] => Compute Buffer decides
-                        args[2] = (uint)item.FoliageMesh.GetIndexStart(subMeshIndex);
-                        args[3] = (uint)item.FoliageMesh.GetBaseVertex(subMeshIndex);
-                        
-                        argBufferList[subMeshIndex].SetData(args);
                         cmd.CopyCounterValue(pointCloudBufferByFootprint[(int)item.Footprint][i], argBufferList[subMeshIndex], sizeof(uint));
                         //TODO : pointCloudBufferByFootprint의 ComputeBuffer는, 어떤 footprint에 대한 FoliageData를 무작위로 가지고 있을 수 있음. foliageData List의 index와 ComputeBuffer의 index가 서로 맞지 않을 수 있음
-
+                        
                         foliageMaterials[subMeshIndex].SetBuffer("_PerInstanceData", pointCloudBufferByFootprint[(int)item.Footprint][i]);
                         cmd.DrawMeshInstancedIndirect(item.FoliageMesh, subMeshIndex, foliageMaterials[subMeshIndex],
                             0, argBufferList[subMeshIndex]);
